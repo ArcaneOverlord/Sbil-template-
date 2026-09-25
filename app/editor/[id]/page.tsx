@@ -76,13 +76,13 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
   const endPan = () => setIsPanning(false);
 
-  // UPGRADED ALGORITHM: Perfectly center within the visible bounding box
+  // FIX 1: Upgraded Multiplier for Extreme Edges
   const getCanvasTransform = () => {
     if (isPanEnabled) {
       return `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})`;
     }
 
-    if (activeSlot === null) return 'translateY(5%) scale(1)'; // Default view
+    if (activeSlot === null) return 'translateY(5%) scale(1)'; 
 
     const slot = template.slots[activeSlot];
     if (slot && slot.imageBox && slot.imageBox.top) {
@@ -95,15 +95,13 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
           heightPercent = (parseFloat(slot.imageBox.height) / 4961) * 100;
        }
 
-       // Find the true center of the selected slot
        const slotCenter = topPercent + (heightPercent / 2);
        
-       // Calculate offset from the middle of the poster
-       const offset = 50 - slotCenter;
+       // A 1.65x multiplier aggressively yanks items at the extreme bottom (like #3) 
+       // high enough to clear the drawer and enter the visible red box.
+       const offset = (50 - slotCenter) * 1.65;
        
-       // Multiply by 1.4 to compensate for CSS transform mechanics during a 1.45x scale
-       // We no longer need arbitrary +15% nudges because the wrapper now has top padding
-       return `translateY(${offset * 1.4}%) scale(1.45)`;
+       return `translateY(${offset}%) scale(1.45)`;
     }
 
     return 'translateY(5%) scale(1)';
@@ -183,7 +181,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
       </div>
 
       <div 
-        // ADDED: pt-[80px] to push the flex center down into the visual safe zone below the sticky header
         className={`w-full absolute top-0 left-0 flex justify-center items-center overflow-hidden pt-[80px] pb-4 ${isPanEnabled ? 'touch-none' : ''}`}
         style={{ height: `${100 - drawerHeight}%` }}
         onPointerDown={startPan} onPointerMove={doPan} onPointerUp={endPan} onPointerLeave={endPan}
@@ -207,7 +204,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         </div>
 
         <div 
-          // REMOVED: mt-12 (Margin top is no longer needed since the wrapper has padding)
           className={`transition-transform ease-in-out w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-500 pointer-events-none'}`}
           style={{ transform: getCanvasTransform() }}
         >
@@ -265,6 +261,11 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                 </div>
               </div>
             ))}
+            
+            {/* FIX 2: Virtual Keyboard Spacer */}
+            {/* This ensures the scroll container can be pushed high enough so the last item isn't hidden behind Android's keyboard */}
+            <div className="h-80 sm:h-8 w-full shrink-0 pointer-events-none"></div>
+
           </div>
         </div>
       </div>
