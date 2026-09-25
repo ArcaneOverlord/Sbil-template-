@@ -25,7 +25,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [drawerHeight, setDrawerHeight] = useState(15); 
   const [isDraggingDrawer, setIsDraggingDrawer] = useState(false);
   
-  // SOLUTION: Pan & Zoom State with Lock
   const [isPanEnabled, setIsPanEnabled] = useState(false);
   const [workspaceZoom, setWorkspaceZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -77,43 +76,41 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
   const endPan = () => setIsPanning(false);
 
-  // SOLUTION: Dynamic Centering Math
+  // UPGRADED ALGORITHM: Perfectly center within the visible bounding box
   const getCanvasTransform = () => {
-    // If user unlocked free move, let them pan manually
     if (isPanEnabled) {
       return `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})`;
     }
 
-    // Default overview state
-    if (activeSlot === null) return 'translateY(15%) scale(1)';
+    if (activeSlot === null) return 'translateY(5%) scale(1)'; // Default view
 
     const slot = template.slots[activeSlot];
     if (slot && slot.imageBox && slot.imageBox.top) {
        const topPercent = parseFloat(slot.imageBox.top);
        
-       // Calculate true height as percentage (whether config used px or %)
-       let heightPercent = 15; // default fallback
+       let heightPercent = 15; 
        if (slot.imageBox.height.includes('%')) {
           heightPercent = parseFloat(slot.imageBox.height);
        } else if (slot.imageBox.height.includes('px')) {
-          heightPercent = (parseFloat(slot.imageBox.height) / 4961) * 100; // 4961px is template height
+          heightPercent = (parseFloat(slot.imageBox.height) / 4961) * 100;
        }
 
-       // Find the true center of this specific slot
+       // Find the true center of the selected slot
        const slotCenter = topPercent + (heightPercent / 2);
        
-       // Calculate exactly how far to shift the poster to bring this slot to the 50% mark
+       // Calculate offset from the middle of the poster
        const offset = 50 - slotCenter;
        
-       // Nudge down slightly (+10) to account for the sticky top nav bar covering the top edge
-       return `translateY(${offset + 10}%) scale(1.4)`;
+       // Multiply by 1.4 to compensate for CSS transform mechanics during a 1.45x scale
+       // We no longer need arbitrary +15% nudges because the wrapper now has top padding
+       return `translateY(${offset * 1.4}%) scale(1.45)`;
     }
 
-    return 'translateY(15%) scale(1)';
+    return 'translateY(5%) scale(1)';
   };
 
   const handleInputFocus = (idx: number) => {
-    setIsPanEnabled(false); // Auto-lock so it snaps to the focused input
+    setIsPanEnabled(false); 
     setActiveSlot(idx);
     setDrawerHeight(65); 
   };
@@ -154,9 +151,9 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
       setIsPanEnabled(false);
       setWorkspaceZoom(1); 
       setPan({x:0, y:0});
-      setActiveSlot(null); // Return to default scale before export
+      setActiveSlot(null); 
       
-      await new Promise(r => setTimeout(r, 400)); // Wait for CSS transitions to finish snapping
+      await new Promise(r => setTimeout(r, 400)); 
       
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
@@ -186,13 +183,12 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
       </div>
 
       <div 
-        // Conditionally apply touch-none so swipe gestures work normally when locked
-        className={`w-full absolute top-0 left-0 flex justify-center items-center overflow-hidden ${isPanEnabled ? 'touch-none' : ''}`}
+        // ADDED: pt-[80px] to push the flex center down into the visual safe zone below the sticky header
+        className={`w-full absolute top-0 left-0 flex justify-center items-center overflow-hidden pt-[80px] pb-4 ${isPanEnabled ? 'touch-none' : ''}`}
         style={{ height: `${100 - drawerHeight}%` }}
         onPointerDown={startPan} onPointerMove={doPan} onPointerUp={endPan} onPointerLeave={endPan}
       >
         <div className="absolute right-4 bottom-4 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur-sm">
-           
            <button 
               onClick={() => setIsPanEnabled(!isPanEnabled)} 
               className={`flex flex-col items-center justify-center p-2 rounded-lg text-[10px] font-bold transition-all ${isPanEnabled ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
@@ -211,7 +207,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         </div>
 
         <div 
-          className={`transition-transform ease-in-out w-full h-full flex items-center justify-center mt-12 ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-500 pointer-events-none'}`}
+          // REMOVED: mt-12 (Margin top is no longer needed since the wrapper has padding)
+          className={`transition-transform ease-in-out w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-500 pointer-events-none'}`}
           style={{ transform: getCanvasTransform() }}
         >
           <PosterCanvas ref={posterRef} template={template} achievers={achievers} />
