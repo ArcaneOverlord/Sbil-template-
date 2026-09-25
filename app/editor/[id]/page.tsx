@@ -13,6 +13,7 @@ interface AchieverData {
 }
 
 export default function Editor({ params }: { params: { id: string } }) {
+  // If the URL ID doesn't match a template in lib/templates.ts, it triggers a 404
   const template = posterTemplates.find(t => t.id === params.id);
   if (!template) notFound(); 
 
@@ -21,11 +22,9 @@ export default function Editor({ params }: { params: { id: string } }) {
   const [isExporting, setIsExporting] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
   
-  // SOLUTION: Start closed at 15%
   const [drawerHeight, setDrawerHeight] = useState(15); 
   const [isDraggingDrawer, setIsDraggingDrawer] = useState(false);
   
-  // SOLUTION: Poster Workspace Pan & Zoom State
   const [workspaceZoom, setWorkspaceZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -35,7 +34,6 @@ export default function Editor({ params }: { params: { id: string } }) {
     template.slots.map(() => ({ name: '', detail: '', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
   );
 
-  // SOLUTION: Prevent Back Navigation
   useEffect(() => {
     window.history.pushState(null, '', window.location.href);
     const handlePopState = () => {
@@ -55,7 +53,6 @@ export default function Editor({ params }: { params: { id: string } }) {
     };
   }, [router]);
 
-  // Handlers for Drawer
   const handleDrawerMove = (e: React.TouchEvent | React.MouseEvent) => {
     if (!isDraggingDrawer) return;
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
@@ -64,7 +61,6 @@ export default function Editor({ params }: { params: { id: string } }) {
     if (newHeight >= 15 && newHeight <= 65) setDrawerHeight(newHeight);
   };
 
-  // Handlers for Workspace Panning
   const startPan = (e: React.PointerEvent) => {
     setIsPanning(true);
     lastPanPoint.current = { x: e.clientX, y: e.clientY };
@@ -78,10 +74,9 @@ export default function Editor({ params }: { params: { id: string } }) {
   };
   const endPan = () => setIsPanning(false);
 
-  // Focus Handler for Keyboard Push
   const handleInputFocus = (idx: number) => {
     setActiveSlot(idx);
-    setDrawerHeight(65); // Snap drawer up when keyboard opens
+    setDrawerHeight(65); 
   };
 
   const handleTextChange = (index: number, field: string, value: string) => {
@@ -115,9 +110,9 @@ export default function Editor({ params }: { params: { id: string } }) {
     if (!posterRef.current) return;
     try {
       setIsExporting(true);
-      setWorkspaceZoom(1); // Reset zoom to ensure perfect capture
+      setWorkspaceZoom(1); 
       setPan({x:0, y:0});
-      await new Promise(r => setTimeout(r, 300)); // wait for animation
+      await new Promise(r => setTimeout(r, 300)); 
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
       link.download = `${template.id}-${Date.now()}.png`;
@@ -145,13 +140,11 @@ export default function Editor({ params }: { params: { id: string } }) {
         </button>
       </div>
 
-      {/* SOLUTION: Panning & Zooming Workspace */}
       <div 
         className="w-full absolute top-0 left-0 flex justify-center items-center overflow-hidden touch-none"
         style={{ height: `${100 - drawerHeight}%` }}
         onPointerDown={startPan} onPointerMove={doPan} onPointerUp={endPan} onPointerLeave={endPan}
       >
-        {/* Workspace Zoom Controls */}
         <div className="absolute right-4 bottom-4 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700">
            <button onClick={() => setWorkspaceZoom(z => Math.min(z + 0.2, 3))} className="p-2 hover:bg-slate-700 rounded-lg"><ZoomIn size={20}/></button>
            <button onClick={() => {setWorkspaceZoom(1); setPan({x:0, y:0})}} className="text-xs font-bold text-slate-400">RESET</button>
@@ -196,7 +189,23 @@ export default function Editor({ params }: { params: { id: string } }) {
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(idx, e)} />
                     <div className="flex items-center gap-2 text-slate-400 text-sm"><ImagePlus size={16} />{achiever.image ? 'Change Photo' : 'Upload Photo'}</div>
                   </label>
-                  {/* Image positioning controls hidden for brevity, keep your existing sliders here */}
+                  
+                  {achiever.image && (
+                    <div className="pt-3 border-t border-slate-700/50 mt-3 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Maximize size={14} className="text-slate-500 shrink-0" />
+                        <input type="range" min="0.5" max="3" step="0.1" value={achiever.imgConfig.scale} onChange={(e) => handleImgConfigChange(idx, 'scale', parseFloat(e.target.value))} className="w-full accent-blue-500" />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Move size={14} className="text-slate-500 shrink-0" />
+                        <div className="flex w-full gap-2">
+                           <input type="range" min="-300" max="300" step="10" value={achiever.imgConfig.x} onChange={(e) => handleImgConfigChange(idx, 'x', parseInt(e.target.value))} className="w-1/2 accent-slate-400" />
+                           <input type="range" min="-300" max="300" step="10" value={achiever.imgConfig.y} onChange={(e) => handleImgConfigChange(idx, 'y', parseInt(e.target.value))} className="w-1/2 accent-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
             ))}
