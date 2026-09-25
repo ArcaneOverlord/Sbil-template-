@@ -25,9 +25,10 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [drawerHeight, setDrawerHeight] = useState(15); 
   const [isDraggingDrawer, setIsDraggingDrawer] = useState(false);
   
+  // Workspace Free-Move State
   const [isPanEnabled, setIsPanEnabled] = useState(false);
   const [workspaceZoom, setWorkspaceZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [pan, setPan] = useState({ x: 0, y: 0 }); // Default center position
   const [isPanning, setIsPanning] = useState(false);
   const lastPanPoint = useRef({ x: 0, y: 0 });
 
@@ -67,6 +68,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     setIsPanning(true);
     lastPanPoint.current = { x: e.clientX, y: e.clientY };
   };
+  
   const doPan = (e: React.PointerEvent) => {
     if (!isPanning || !isPanEnabled) return;
     const dx = e.clientX - lastPanPoint.current.x;
@@ -74,42 +76,11 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
     lastPanPoint.current = { x: e.clientX, y: e.clientY };
   };
+  
   const endPan = () => setIsPanning(false);
 
-  // FIX: Shift from '%' to 'vh' mapping
-  const getCanvasTransform = () => {
-    if (isPanEnabled) {
-      return `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})`;
-    }
-
-    if (activeSlot === null) return 'translateY(5vh) scale(1)'; 
-
-    const slot = template.slots[activeSlot];
-    if (slot && slot.imageBox && slot.imageBox.top) {
-       const topPercent = parseFloat(slot.imageBox.top);
-       
-       let heightPercent = 15; 
-       if (slot.imageBox.height.includes('%')) {
-          heightPercent = parseFloat(slot.imageBox.height);
-       } else if (slot.imageBox.height.includes('px')) {
-          heightPercent = (parseFloat(slot.imageBox.height) / 4961) * 100;
-       }
-
-       const slotCenter = topPercent + (heightPercent / 2);
-       
-       // Calculate offset from the middle of the poster
-       const offset = 50 - slotCenter;
-       
-       // By using 'vh' instead of '%', a 1.2 multiplier perfectly translates 
-       // the massive poster to any screen size, guaranteeing item 3 is pulled all the way up.
-       return `translateY(${offset * 1.2}vh) scale(1.45)`;
-    }
-
-    return 'translateY(5vh) scale(1)';
-  };
-
   const handleInputFocus = (idx: number) => {
-    setIsPanEnabled(false); 
+    setIsPanEnabled(false); // Auto-lock canvas to prevent accidental panning while typing
     setActiveSlot(idx);
     setDrawerHeight(65); 
   };
@@ -147,12 +118,11 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     if (!posterRef.current) return;
     try {
       setIsExporting(true);
-      setIsPanEnabled(false);
-      setWorkspaceZoom(1); 
-      setPan({x:0, y:0});
-      setActiveSlot(null); 
+      setIsPanEnabled(false); // Lock it visually during export
       
-      await new Promise(r => setTimeout(r, 400)); 
+      // We don't reset the pan/zoom here because html-to-image captures the inner unscaled div anyway.
+      // Leaving the pan/zoom intact avoids a jarring jump for the user.
+      await new Promise(r => setTimeout(r, 150)); 
       
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
@@ -186,10 +156,11 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         style={{ height: `${100 - drawerHeight}%` }}
         onPointerDown={startPan} onPointerMove={doPan} onPointerUp={endPan} onPointerLeave={endPan}
       >
-        <div className="absolute right-4 bottom-4 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur-sm">
+        {/* LOWERED LOCK BUTTON: Positioned at bottom-2 mb-2 so it sits right on top of the controls drawer */}
+        <div className="absolute right-4 bottom-2 mb-2 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur-sm shadow-lg">
            <button 
               onClick={() => setIsPanEnabled(!isPanEnabled)} 
-              className={`flex flex-col items-center justify-center p-2 rounded-lg text-[10px] font-bold transition-all ${isPanEnabled ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+              className={`flex flex-col items-center justify-center p-2 rounded-lg text-[10px] font-bold transition-all ${isPanEnabled ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
            >
               {isPanEnabled ? <Unlock size={18} className="mb-1" /> : <Lock size={18} className="mb-1" />}
               {isPanEnabled ? 'MOVE' : 'LOCK'}
@@ -205,8 +176,9 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         </div>
 
         <div 
-          className={`transition-transform ease-in-out w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-500 pointer-events-none'}`}
-          style={{ transform: getCanvasTransform() }}
+          // Constant transform mapping strictly to the user's manual pan/zoom state. No snapping.
+          className={`transition-transform w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-300 pointer-events-none'}`}
+          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})` }}
         >
           <PosterCanvas ref={posterRef} template={template} achievers={achievers} />
         </div>
