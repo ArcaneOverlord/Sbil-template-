@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, use } from 'react';
 import { toPng } from 'html-to-image';
 import PosterCanvas from '@/components/PosterCanvas';
-import { Download, ImagePlus, ArrowLeft, Maximize, Move, ZoomIn, ZoomOut } from 'lucide-react';
+import { Download, ImagePlus, ArrowLeft, Maximize, Move, ZoomIn, ZoomOut, Lock, Unlock } from 'lucide-react';
 import { posterTemplates } from '@/lib/templates';
 import { notFound, useRouter } from 'next/navigation';
 
@@ -25,6 +25,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [drawerHeight, setDrawerHeight] = useState(15); 
   const [isDraggingDrawer, setIsDraggingDrawer] = useState(false);
   
+  // SOLUTION: Pan & Zoom State with Lock
+  const [isPanEnabled, setIsPanEnabled] = useState(false);
   const [workspaceZoom, setWorkspaceZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -62,11 +64,12 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
 
   const startPan = (e: React.PointerEvent) => {
+    if (!isPanEnabled) return;
     setIsPanning(true);
     lastPanPoint.current = { x: e.clientX, y: e.clientY };
   };
   const doPan = (e: React.PointerEvent) => {
-    if (!isPanning) return;
+    if (!isPanning || !isPanEnabled) return;
     const dx = e.clientX - lastPanPoint.current.x;
     const dy = e.clientY - lastPanPoint.current.y;
     setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
@@ -74,7 +77,43 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
   const endPan = () => setIsPanning(false);
 
+  // SOLUTION: Dynamic Centering Math
+  const getCanvasTransform = () => {
+    // If user unlocked free move, let them pan manually
+    if (isPanEnabled) {
+      return `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})`;
+    }
+
+    // Default overview state
+    if (activeSlot === null) return 'translateY(15%) scale(1)';
+
+    const slot = template.slots[activeSlot];
+    if (slot && slot.imageBox && slot.imageBox.top) {
+       const topPercent = parseFloat(slot.imageBox.top);
+       
+       // Calculate true height as percentage (whether config used px or %)
+       let heightPercent = 15; // default fallback
+       if (slot.imageBox.height.includes('%')) {
+          heightPercent = parseFloat(slot.imageBox.height);
+       } else if (slot.imageBox.height.includes('px')) {
+          heightPercent = (parseFloat(slot.imageBox.height) / 4961) * 100; // 4961px is template height
+       }
+
+       // Find the true center of this specific slot
+       const slotCenter = topPercent + (heightPercent / 2);
+       
+       // Calculate exactly how far to shift the poster to bring this slot to the 50% mark
+       const offset = 50 - slotCenter;
+       
+       // Nudge down slightly (+10) to account for the sticky top nav bar covering the top edge
+       return `translateY(${offset + 10}%) scale(1.4)`;
+    }
+
+    return 'translateY(15%) scale(1)';
+  };
+
   const handleInputFocus = (idx: number) => {
+    setIsPanEnabled(false); // Auto-lock so it snaps to the focused input
     setActiveSlot(idx);
     setDrawerHeight(65); 
   };
@@ -99,6 +138,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         newAchievers[index].image = event.target?.result as string;
         newAchievers[index].imgConfig = { scale: 1, x: 0, y: 0 }; 
         setAchievers(newAchievers);
+        
+        setIsPanEnabled(false);
         setActiveSlot(index); 
         setDrawerHeight(65);
       };
@@ -110,9 +151,13 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     if (!posterRef.current) return;
     try {
       setIsExporting(true);
+      setIsPanEnabled(false);
       setWorkspaceZoom(1); 
       setPan({x:0, y:0});
-      await new Promise(r => setTimeout(r, 300)); 
+      setActiveSlot(null); // Return to default scale before export
+      
+      await new Promise(r => setTimeout(r, 400)); // Wait for CSS transitions to finish snapping
+      
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
       link.download = `${template.id}-${Date.now()}.png`;
@@ -132,28 +177,42 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
       onMouseUp={() => setIsDraggingDrawer(false)} onTouchEnd={() => setIsDraggingDrawer(false)}
     >
       <div className="fixed top-0 left-0 w-full pt-6 pb-4 px-4 flex justify-between items-center z-50 pointer-events-none bg-gradient-to-b from-slate-950/80 to-transparent">
-        <button onClick={() => { if(confirm("Discard progress?")) router.push('/gallery'); }} className="pointer-events-auto flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-700 shadow-lg text-white px-4 py-2 rounded-xl text-sm font-medium">
+        <button onClick={() => { if(confirm("Discard progress?")) router.push('/gallery'); }} className="pointer-events-auto flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-700 shadow-lg text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800">
           <ArrowLeft size={18} /> Exit
         </button>
-        <button onClick={exportPoster} disabled={isExporting} className="pointer-events-auto flex items-center gap-2 bg-blue-600/90 backdrop-blur-md border border-blue-500 shadow-lg text-white px-4 py-2 rounded-xl text-sm font-medium">
+        <button onClick={exportPoster} disabled={isExporting} className="pointer-events-auto flex items-center gap-2 bg-blue-600/90 backdrop-blur-md border border-blue-500 shadow-lg text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-blue-500">
           <Download size={18} /> {isExporting ? 'Exporting...' : 'Export'}
         </button>
       </div>
 
       <div 
-        className="w-full absolute top-0 left-0 flex justify-center items-center overflow-hidden touch-none"
+        // Conditionally apply touch-none so swipe gestures work normally when locked
+        className={`w-full absolute top-0 left-0 flex justify-center items-center overflow-hidden ${isPanEnabled ? 'touch-none' : ''}`}
         style={{ height: `${100 - drawerHeight}%` }}
         onPointerDown={startPan} onPointerMove={doPan} onPointerUp={endPan} onPointerLeave={endPan}
       >
-        <div className="absolute right-4 bottom-4 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700">
-           <button onClick={() => setWorkspaceZoom(z => Math.min(z + 0.2, 3))} className="p-2 hover:bg-slate-700 rounded-lg"><ZoomIn size={20}/></button>
-           <button onClick={() => {setWorkspaceZoom(1); setPan({x:0, y:0})}} className="text-xs font-bold text-slate-400">RESET</button>
-           <button onClick={() => setWorkspaceZoom(z => Math.max(z - 0.2, 0.5))} className="p-2 hover:bg-slate-700 rounded-lg"><ZoomOut size={20}/></button>
+        <div className="absolute right-4 bottom-4 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur-sm">
+           
+           <button 
+              onClick={() => setIsPanEnabled(!isPanEnabled)} 
+              className={`flex flex-col items-center justify-center p-2 rounded-lg text-[10px] font-bold transition-all ${isPanEnabled ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+           >
+              {isPanEnabled ? <Unlock size={18} className="mb-1" /> : <Lock size={18} className="mb-1" />}
+              {isPanEnabled ? 'MOVE' : 'LOCK'}
+           </button>
+
+           {isPanEnabled && (
+             <div className="flex flex-col gap-1 mt-1 pt-2 border-t border-slate-700/50 animate-in fade-in zoom-in duration-200">
+               <button onClick={() => setWorkspaceZoom(z => Math.min(z + 0.2, 3))} className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"><ZoomIn size={18}/></button>
+               <button onClick={() => {setWorkspaceZoom(1); setPan({x:0, y:0})}} className="text-[10px] font-bold text-slate-400 py-1 hover:text-white transition-colors">RESET</button>
+               <button onClick={() => setWorkspaceZoom(z => Math.max(z - 0.2, 0.5))} className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"><ZoomOut size={18}/></button>
+             </div>
+           )}
         </div>
 
         <div 
-          className="transition-transform duration-75 ease-linear w-full h-full flex items-center justify-center mt-12 cursor-grab active:cursor-grabbing"
-          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})` }}
+          className={`transition-transform ease-in-out w-full h-full flex items-center justify-center mt-12 ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-500 pointer-events-none'}`}
+          style={{ transform: getCanvasTransform() }}
         >
           <PosterCanvas ref={posterRef} template={template} achievers={achievers} />
         </div>
@@ -173,7 +232,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         <div className="px-6 pb-6 overflow-y-auto flex-1 overscroll-contain">
           <div className="space-y-4">
             {achievers.map((achiever, idx) => (
-              <div key={idx} className={`p-4 rounded-xl border transition-colors ${activeSlot === idx ? 'bg-slate-800 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'bg-slate-950 border-slate-800'}`}>
+              <div key={idx} className={`p-4 rounded-xl border transition-all duration-300 ${activeSlot === idx ? 'bg-slate-800 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-slate-950 border-slate-800'}`}>
                 <h3 className="font-semibold text-amber-400 mb-3 text-sm">Achiever No.{idx + 1}</h3>
                 <div className="space-y-3">
                   {template.slots[idx].textBoxes.map(tb => (
@@ -185,13 +244,13 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                       className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
                     />
                   ))}
-                  <label className="flex items-center justify-center w-full h-12 border border-dashed border-slate-600 rounded-lg hover:border-blue-500 hover:bg-slate-800/50 cursor-pointer">
+                  <label className="flex items-center justify-center w-full h-12 border border-dashed border-slate-600 rounded-lg hover:border-blue-500 hover:bg-slate-800/50 cursor-pointer transition-colors">
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(idx, e)} />
                     <div className="flex items-center gap-2 text-slate-400 text-sm"><ImagePlus size={16} />{achiever.image ? 'Change Photo' : 'Upload Photo'}</div>
                   </label>
                   
                   {achiever.image && (
-                    <div className="pt-3 border-t border-slate-700/50 mt-3 space-y-3">
+                    <div className="pt-3 border-t border-slate-700/50 mt-3 space-y-3 animate-in fade-in duration-300">
                       <div className="flex items-center gap-3">
                         <Maximize size={14} className="text-slate-500 shrink-0" />
                         <input type="range" min="0.5" max="3" step="0.1" value={achiever.imgConfig.scale} onChange={(e) => handleImgConfigChange(idx, 'scale', parseFloat(e.target.value))} className="w-full accent-blue-500" />
