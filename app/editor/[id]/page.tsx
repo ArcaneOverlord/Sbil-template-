@@ -76,13 +76,13 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
   const endPan = () => setIsPanning(false);
 
-  // FIX 1: Upgraded Multiplier for Extreme Edges
+  // FIX: Shift from '%' to 'vh' mapping
   const getCanvasTransform = () => {
     if (isPanEnabled) {
       return `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})`;
     }
 
-    if (activeSlot === null) return 'translateY(5%) scale(1)'; 
+    if (activeSlot === null) return 'translateY(5vh) scale(1)'; 
 
     const slot = template.slots[activeSlot];
     if (slot && slot.imageBox && slot.imageBox.top) {
@@ -97,14 +97,15 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
 
        const slotCenter = topPercent + (heightPercent / 2);
        
-       // A 1.65x multiplier aggressively yanks items at the extreme bottom (like #3) 
-       // high enough to clear the drawer and enter the visible red box.
-       const offset = (50 - slotCenter) * 1.65;
+       // Calculate offset from the middle of the poster
+       const offset = 50 - slotCenter;
        
-       return `translateY(${offset}%) scale(1.45)`;
+       // By using 'vh' instead of '%', a 1.2 multiplier perfectly translates 
+       // the massive poster to any screen size, guaranteeing item 3 is pulled all the way up.
+       return `translateY(${offset * 1.2}vh) scale(1.45)`;
     }
 
-    return 'translateY(5%) scale(1)';
+    return 'translateY(5vh) scale(1)';
   };
 
   const handleInputFocus = (idx: number) => {
@@ -261,11 +262,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                 </div>
               </div>
             ))}
-            
-            {/* FIX 2: Virtual Keyboard Spacer */}
-            {/* This ensures the scroll container can be pushed high enough so the last item isn't hidden behind Android's keyboard */}
             <div className="h-80 sm:h-8 w-full shrink-0 pointer-events-none"></div>
-
           </div>
         </div>
       </div>
