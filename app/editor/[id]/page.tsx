@@ -215,4 +215,3 @@ export default function Editor({ params }: { params: { id: string } }) {
     </main>
   );
 }
-.
