@@ -28,7 +28,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   // Workspace Free-Move State
   const [isPanEnabled, setIsPanEnabled] = useState(false);
   const [workspaceZoom, setWorkspaceZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 }); // Default center position
+  const [pan, setPan] = useState({ x: 0, y: 0 }); 
   const [isPanning, setIsPanning] = useState(false);
   const lastPanPoint = useRef({ x: 0, y: 0 });
 
@@ -80,7 +80,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const endPan = () => setIsPanning(false);
 
   const handleInputFocus = (idx: number) => {
-    setIsPanEnabled(false); // Auto-lock canvas to prevent accidental panning while typing
+    // REMOVED: setIsPanEnabled(false); - No more auto-locking when typing!
     setActiveSlot(idx);
     setDrawerHeight(65); 
   };
@@ -106,7 +106,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         newAchievers[index].imgConfig = { scale: 1, x: 0, y: 0 }; 
         setAchievers(newAchievers);
         
-        setIsPanEnabled(false);
+        // REMOVED: setIsPanEnabled(false); - No more auto-locking on image upload!
         setActiveSlot(index); 
         setDrawerHeight(65);
       };
@@ -118,10 +118,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     if (!posterRef.current) return;
     try {
       setIsExporting(true);
-      setIsPanEnabled(false); // Lock it visually during export
+      setIsPanEnabled(false); // We still lock visually during export so the user can't accidentally drag it while rendering
       
-      // We don't reset the pan/zoom here because html-to-image captures the inner unscaled div anyway.
-      // Leaving the pan/zoom intact avoids a jarring jump for the user.
       await new Promise(r => setTimeout(r, 150)); 
       
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
@@ -156,7 +154,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         style={{ height: `${100 - drawerHeight}%` }}
         onPointerDown={startPan} onPointerMove={doPan} onPointerUp={endPan} onPointerLeave={endPan}
       >
-        {/* LOWERED LOCK BUTTON: Positioned at bottom-2 mb-2 so it sits right on top of the controls drawer */}
         <div className="absolute right-4 bottom-2 mb-2 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur-sm shadow-lg">
            <button 
               onClick={() => setIsPanEnabled(!isPanEnabled)} 
@@ -176,7 +173,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         </div>
 
         <div 
-          // Constant transform mapping strictly to the user's manual pan/zoom state. No snapping.
           className={`transition-transform w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-300 pointer-events-none'}`}
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})` }}
         >
