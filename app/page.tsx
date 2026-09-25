@@ -5,13 +5,12 @@ import { Image as ImageIcon, FolderClock, LayoutTemplate } from 'lucide-react';
 
 export default function Home() {
   return (
-    <main className="min-h-[100dvh] bg-slate-950 text-slate-200 p-6 flex flex-col items-center justify-center">
-      <div className="absolute top-6 right-6">
+    <main className="min-h-[100dvh] bg-slate-950 text-slate-200 p-6 flex flex-col items-center justify-center relative overflow-hidden">
+      <div className="absolute top-6 right-6 z-50">
         <InstallPWA />
       </div>
 
-      {/* App Logo & Title */}
-      <div className="flex flex-col items-center text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col items-center text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10">
         <div className="w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center shadow-[0_0_40px_rgba(37,99,235,0.3)] mb-6">
           <ImageIcon size={48} className="text-white" />
         </div>
@@ -19,9 +18,7 @@ export default function Home() {
         <p className="text-slate-400">SBI Life Achievement Posters</p>
       </div>
 
-      {/* Navigation Options */}
-      <div className="flex flex-col sm:flex-row gap-6 w-full max-w-2xl px-4">
-        
+      <div className="flex flex-col sm:flex-row gap-6 w-full max-w-2xl px-4 relative z-10">
         <Link href="/gallery" className="flex-1 group bg-slate-900 border border-slate-800 rounded-3xl p-8 hover:border-blue-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all duration-300 flex flex-col items-center text-center">
           <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <LayoutTemplate size={32} className="text-blue-500" />
@@ -37,7 +34,6 @@ export default function Home() {
           <h2 className="text-xl font-bold text-white mb-2">Exported Files</h2>
           <p className="text-sm text-slate-400">View your previously exported and recent templates.</p>
         </Link>
-
       </div>
     </main>
   );

@@ -5,7 +5,7 @@ import { Template } from '@/lib/templates';
 interface PosterProps {
   template: Template;
   achievers: {
-    [key: string]: any; // Changed from string to any to allow image and imgConfig types
+    [key: string]: any; 
     image: string | null;
     imgConfig: { scale: number; x: number; y: number };
   }[];
@@ -29,7 +29,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
 
             return (
               <React.Fragment key={slot.id}>
-                {/* Image Box */}
                 <div 
                   className="absolute overflow-hidden bg-gray-200 z-0"
                   style={{
@@ -49,7 +48,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
                   )}
                 </div>
 
-                {/* Text Boxes */}
                 {slot.textBoxes.map((tb) => (
                   <div 
                     key={tb.id}

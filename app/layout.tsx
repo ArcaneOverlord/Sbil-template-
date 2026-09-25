@@ -10,14 +10,12 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
-// SOLUTION: Prevent whole page zoom and handle virtual keyboard layout shifts
 export const viewport: Viewport = {
   themeColor: "#0f172a",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  // This tells modern mobile browsers to overlay the keyboard rather than squishing the 100dvh layout
   interactiveWidget: "overlays-content", 
 };
 

@@ -4,7 +4,7 @@ import { ArrowLeft, Clock } from 'lucide-react';
 export default function RecentsDummy() {
   return (
     <main className="min-h-[100dvh] bg-slate-950 text-slate-200 p-6">
-      <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8">
+      <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors">
         <ArrowLeft size={20} /> Back to Home
       </Link>
       

@@ -17,16 +17,10 @@ export default function PreviewModal({ template, isOpen, onClose }: PreviewModal
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm">
       <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[95vh] flex flex-col md:flex-row overflow-hidden shadow-2xl">
         
-        {/* Left Side: Scaled Preview (Fixed Mobile Overflow) */}
         <div className="w-full md:w-2/3 bg-slate-950 p-4 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-700 h-[45vh] md:h-auto">
-          <img 
-            src={template.thumbnail} 
-            alt={template.name} 
-            className="w-full h-full object-contain drop-shadow-2xl"
-          />
+          <img src={template.thumbnail} alt={template.name} className="w-full h-full object-contain drop-shadow-2xl" />
         </div>
 
-        {/* Right Side: Details & Actions */}
         <div className="w-full md:w-1/3 p-6 flex flex-col overflow-y-auto">
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-2xl font-bold text-white">{template.name}</h2>

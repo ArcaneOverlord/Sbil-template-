@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import { toPng } from 'html-to-image';
 import PosterCanvas from '@/components/PosterCanvas';
 import { Download, ImagePlus, ArrowLeft, Maximize, Move, ZoomIn, ZoomOut } from 'lucide-react';
@@ -12,8 +12,8 @@ interface AchieverData {
   imgConfig: { scale: number; x: number; y: number };
 }
 
-export default function Editor({ params }: { params: { id: string } }) {
-  // If the URL ID doesn't match a template in lib/templates.ts, it triggers a 404
+export default function Editor(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const template = posterTemplates.find(t => t.id === params.id);
   if (!template) notFound(); 
 
