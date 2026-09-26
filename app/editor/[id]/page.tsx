@@ -31,11 +31,20 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [isPanning, setIsPanning] = useState(false);
   const lastPanPoint = useRef({ x: 0, y: 0 });
 
+  // HARD LOCK: Bypass CSS viewport bugs by forcing the exact pixel height
+  const [viewportHeight, setViewportHeight] = useState('100vh');
+
   const [achievers, setAchievers] = useState<AchieverData[]>(
     template.slots.map(() => ({ name: '', detail: '', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
   );
 
   useEffect(() => {
+    // Exact Pixel Height Engine
+    const updateHeight = () => setViewportHeight(`${window.innerHeight}px`);
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+
+    // Prevent Back Navigation
     window.history.pushState(null, '', window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, '', window.location.href);
@@ -49,6 +58,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     window.addEventListener('beforeunload', handleBeforeUnload);
     
     return () => {
+      window.removeEventListener('resize', updateHeight);
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
@@ -131,10 +141,9 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
 
   return (
-    // FIX: Changed h-[100dvh] to fixed inset-0. This completely locks the UI to the visual screen bounds, 
-    // ensuring the controls drawer is never pushed out of view by the browser's scrolling mechanics.
     <main 
-      className="fixed inset-0 w-full bg-slate-950 text-slate-200 flex flex-col overflow-hidden overscroll-none"
+      className="fixed top-0 left-0 w-full bg-slate-950 text-slate-200 flex flex-col overflow-hidden overscroll-none touch-none"
+      style={{ height: viewportHeight }} // Forces strict adherence to true pixel height
       onMouseMove={handleDrawerMove} onTouchMove={handleDrawerMove}
       onMouseUp={() => setIsDraggingDrawer(false)} onTouchEnd={() => setIsDraggingDrawer(false)}
     >

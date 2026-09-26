@@ -15,36 +15,35 @@ export default function PreviewModal({ template, isOpen, onClose }: PreviewModal
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm overflow-hidden">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden shadow-2xl">
+      {/* Reduced max-h to 85vh to ensure breathing room on mobile */}
+      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col md:flex-row overflow-hidden shadow-2xl relative">
         
-        <div className="w-full md:w-2/3 bg-slate-950 p-4 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-700 h-[45vh] md:h-auto shrink-0">
-          <img src={template.thumbnail} alt={template.name} className="w-full h-full object-contain drop-shadow-2xl" />
+        {/* Image Area */}
+        <div className="w-full md:w-2/3 bg-slate-950 p-4 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-700 h-[40vh] md:h-auto shrink-0 relative">
+          <img src={template.thumbnail} alt={template.name} className="absolute inset-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)] object-contain drop-shadow-2xl" />
         </div>
 
-        {/* FIX: Restructured flexbox to pin the button to the bottom */}
-        <div className="w-full md:w-1/3 flex flex-col h-[45vh] md:h-auto">
+        {/* Info & Button Area (min-h-0 strictly forces it to shrink instead of overflowing) */}
+        <div className="w-full md:w-1/3 flex flex-col flex-1 min-h-0">
           
-          <div className="p-6 pb-2 flex justify-between items-start shrink-0">
-            <h2 className="text-2xl font-bold text-white">{template.name}</h2>
+          <div className="p-4 sm:p-6 pb-2 flex justify-between items-start shrink-0">
+            <h2 className="text-xl sm:text-2xl font-bold text-white">{template.name}</h2>
             <button onClick={onClose} className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full bg-slate-800/50">
               <X size={20} />
             </button>
           </div>
 
-          <div className="px-6 overflow-y-auto flex-1">
-            <p className="text-slate-400 text-sm mb-6">{template.description}</p>
-            
-            <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-6">
+          <div className="px-4 sm:px-6 overflow-y-auto flex-1">
+            <p className="text-slate-400 text-sm mb-4">{template.description}</p>
+            <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4">
               <p className="text-sm text-slate-300">
-                <span className="font-semibold text-amber-400">{template.slots.length}</span> Image Slots Available
+                <span className="font-semibold text-amber-400">{template.slots.length}</span> Image Slots
               </p>
-              <p className="text-sm text-slate-300 mt-1">
-                Format: <span className="font-semibold">A3 (300 DPI)</span>
-              </p>
+              <p className="text-sm text-slate-300 mt-1">Format: <span className="font-semibold">A3 (300 DPI)</span></p>
             </div>
           </div>
 
-          <div className="p-6 pt-4 shrink-0 border-t border-slate-800 bg-slate-900">
+          <div className="p-4 sm:p-6 shrink-0 border-t border-slate-800 bg-slate-900 mt-auto z-10">
             <Link 
               href={`/editor/${template.id}`}
               className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-3 px-4 rounded-xl font-semibold transition-colors"

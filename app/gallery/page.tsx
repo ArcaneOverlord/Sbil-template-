@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import PreviewModal from '@/components/PreviewModal';
 import { posterTemplates, Template } from '@/lib/templates';
@@ -8,12 +8,18 @@ import { LayoutTemplate, ArrowLeft } from 'lucide-react';
 export default function GalleryPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState('100vh');
+
+  useEffect(() => {
+    const updateHeight = () => setViewportHeight(`${window.innerHeight}px`);
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
 
   return (
-    // FIX: Changed min-h-[100dvh] to min-h-[100svh]
-    <main className="min-h-[100svh] bg-slate-950 text-slate-200 p-6 md:p-12">
+    <main style={{ minHeight: viewportHeight }} className="bg-slate-950 text-slate-200 p-6 md:p-12">
       <div className="max-w-7xl mx-auto">
-        
         <div className="flex flex-col mb-12">
           <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors w-fit">
             <ArrowLeft size={20} /> Back to Home
