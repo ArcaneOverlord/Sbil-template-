@@ -67,14 +67,16 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
                   )}
                 </div>
 
+                {/* BOUNDING BOX ENGINE: Centers text horizontally and vertically inside the defined width/height */}
                 {slot.textBoxes.map((tb) => (
                   <div 
                     key={tb.id}
-                    className="absolute flex flex-col justify-center"
+                    className="absolute flex flex-col items-center justify-center text-center"
                     style={{
                       top: tb.top, 
                       left: tb.left, 
                       width: tb.width, 
+                      height: tb.height, // Applies the bounding box height
                       fontSize: tb.fontSize, 
                       fontWeight: tb.fontWeight, 
                       color: tb.color, 
@@ -82,7 +84,7 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
                       zIndex: 20 
                     }}
                   >
-                    <span style={{ lineHeight: '1.1' }}>
+                    <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word' }}>
                       {achiever[tb.id] || tb.placeholder}
                     </span>
                   </div>

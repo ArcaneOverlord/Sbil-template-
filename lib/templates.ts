@@ -4,6 +4,7 @@ export interface TextConfig {
   top: string;         
   left: string;
   width: string;
+  height: string; // NEW: Defines the vertical bounding box area
   fontSize: string;
   fontWeight: string;
   color: string;
@@ -53,8 +54,9 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '35%', left: '60%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Details / Branch', top: '41.5%', left: '57%', width: '1200px', fontSize: '100px', fontWeight: 'normal', color: '#e2e8f0' }
+          // Bounding boxes shifted left and expanded to cover the golden ribbon area for perfect centering
+          { id: 'name', placeholder: 'Enter Name', top: '31.5%', left: '46%', width: '1600px', height: '250px', fontSize: '130px', fontWeight: 'bold', color: '#ffffff' },
+          { id: 'detail', placeholder: 'Enter Details / Branch', top: '40%', left: '46%', width: '1600px', height: '150px', fontSize: '90px', fontWeight: 'normal', color: '#e2e8f0' }
         ]
       },
       {
@@ -64,8 +66,8 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '56.5%', left: '60%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Details / Branch', top: '63%', left: '57%', width: '1200px', fontSize: '100px', fontWeight: 'normal', color: '#e2e8f0' }
+          { id: 'name', placeholder: 'Enter Name', top: '53.5%', left: '46%', width: '1600px', height: '250px', fontSize: '130px', fontWeight: 'bold', color: '#ffffff' },
+          { id: 'detail', placeholder: 'Enter Details / Branch', top: '61.5%', left: '46%', width: '1600px', height: '150px', fontSize: '90px', fontWeight: 'normal', color: '#e2e8f0' }
         ]
       },
       {
@@ -75,8 +77,8 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '77%', left: '60%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Details / Branch', top: '83%', left: '57%', width: '1200px', fontSize: '100px', fontWeight: 'normal', color: '#e2e8f0' }
+          { id: 'name', placeholder: 'Enter Name', top: '74%', left: '46%', width: '1600px', height: '250px', fontSize: '130px', fontWeight: 'bold', color: '#ffffff' },
+          { id: 'detail', placeholder: 'Enter Details / Branch', top: '82%', left: '46%', width: '1600px', height: '150px', fontSize: '90px', fontWeight: 'normal', color: '#e2e8f0' }
         ]
       }
     ]
