@@ -1,4 +1,4 @@
-export interface TextConfig {
+  export interface TextConfig {
   id: string;          
   placeholder: string;
   top: string;         

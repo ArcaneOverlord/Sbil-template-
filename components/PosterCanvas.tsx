@@ -13,6 +13,9 @@ interface PosterProps {
   }[];
 }
 
+// 🔴 DEBUG TOGGLE: Change to 'false' to hide the red text boundaries
+const DEBUG_MODE = true; 
+
 const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, globalBanner, globalMetric, achievers }, ref) => {
   return (
     <div className="relative flex justify-center items-center w-full h-full pointer-events-none">
@@ -24,10 +27,14 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
           {/* RENDER GLOBAL TEXTS (e.g., The Top Banner) */}
           {template.globalTexts && template.globalTexts.map((tb) => (
             <div 
-              key={tb.id} className="absolute flex flex-col items-center justify-center text-center"
+              key={tb.id} 
+              className="absolute flex flex-col items-center justify-center text-center"
               style={{
                 top: tb.top, left: tb.left, width: tb.width, height: tb.height, 
-                fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20 
+                fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20,
+                // Debug Mode Styling
+                border: DEBUG_MODE ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none',
+                backgroundColor: DEBUG_MODE ? 'rgba(239, 68, 68, 0.2)' : 'transparent'
               }}
             >
               <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word' }}>
@@ -74,10 +81,14 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
 
                   return (
                     <div 
-                      key={tb.id} className="absolute flex flex-col items-center justify-center text-center"
+                      key={tb.id} 
+                      className="absolute flex flex-col items-center justify-center text-center"
                       style={{
                         top: tb.top, left: tb.left, width: tb.width, height: tb.height, 
-                        fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none', zIndex: 20 
+                        fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none', zIndex: 20,
+                        // Debug Mode Styling
+                        border: DEBUG_MODE ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none',
+                        backgroundColor: DEBUG_MODE ? 'rgba(239, 68, 68, 0.2)' : 'transparent'
                       }}
                     >
                       <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word' }}>
