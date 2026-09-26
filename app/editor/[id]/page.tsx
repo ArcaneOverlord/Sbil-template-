@@ -25,7 +25,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [drawerHeight, setDrawerHeight] = useState(15); 
   const [isDraggingDrawer, setIsDraggingDrawer] = useState(false);
   
-  // Workspace Free-Move State
   const [isPanEnabled, setIsPanEnabled] = useState(false);
   const [workspaceZoom, setWorkspaceZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 }); 
@@ -80,7 +79,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const endPan = () => setIsPanning(false);
 
   const handleInputFocus = (idx: number) => {
-    // REMOVED: setIsPanEnabled(false); - No more auto-locking when typing!
     setActiveSlot(idx);
     setDrawerHeight(65); 
   };
@@ -105,8 +103,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         newAchievers[index].image = event.target?.result as string;
         newAchievers[index].imgConfig = { scale: 1, x: 0, y: 0 }; 
         setAchievers(newAchievers);
-        
-        // REMOVED: setIsPanEnabled(false); - No more auto-locking on image upload!
         setActiveSlot(index); 
         setDrawerHeight(65);
       };
@@ -118,7 +114,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     if (!posterRef.current) return;
     try {
       setIsExporting(true);
-      setIsPanEnabled(false); // We still lock visually during export so the user can't accidentally drag it while rendering
+      setIsPanEnabled(false); 
       
       await new Promise(r => setTimeout(r, 150)); 
       
@@ -135,12 +131,14 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
 
   return (
+    // FIX: Changed h-[100dvh] to fixed inset-0. This completely locks the UI to the visual screen bounds, 
+    // ensuring the controls drawer is never pushed out of view by the browser's scrolling mechanics.
     <main 
-      className="h-[100dvh] w-full bg-slate-950 text-slate-200 flex flex-col relative overflow-hidden overscroll-none"
+      className="fixed inset-0 w-full bg-slate-950 text-slate-200 flex flex-col overflow-hidden overscroll-none"
       onMouseMove={handleDrawerMove} onTouchMove={handleDrawerMove}
       onMouseUp={() => setIsDraggingDrawer(false)} onTouchEnd={() => setIsDraggingDrawer(false)}
     >
-      <div className="fixed top-0 left-0 w-full pt-6 pb-4 px-4 flex justify-between items-center z-50 pointer-events-none bg-gradient-to-b from-slate-950/80 to-transparent">
+      <div className="absolute top-0 left-0 w-full pt-6 pb-4 px-4 flex justify-between items-center z-50 pointer-events-none bg-gradient-to-b from-slate-950/80 to-transparent">
         <button onClick={() => { if(confirm("Discard progress?")) router.push('/gallery'); }} className="pointer-events-auto flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-700 shadow-lg text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800">
           <ArrowLeft size={18} /> Exit
         </button>

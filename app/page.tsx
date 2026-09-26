@@ -1,12 +1,24 @@
 "use client";
 import Link from 'next/link';
 import InstallPWA from '@/components/InstallPWA';
-import { Image as ImageIcon, FolderClock, LayoutTemplate } from 'lucide-react';
+import { Image as ImageIcon, FolderClock, LayoutTemplate, HelpCircle, User } from 'lucide-react';
 
 export default function Home() {
   return (
-    <main className="min-h-[100dvh] bg-slate-950 text-slate-200 p-6 flex flex-col items-center justify-center relative overflow-hidden">
-      <div className="absolute top-6 right-6 z-50">
+    // FIX: Changed min-h-[100dvh] to min-h-[100svh] to fix the downward push
+    <main className="min-h-[100svh] bg-slate-950 text-slate-200 p-6 flex flex-col items-center justify-center relative overflow-hidden">
+      
+      {/* UI IMPROVEMENT: Added Support and Account buttons to top right */}
+      <div className="absolute top-6 right-6 z-50 flex items-center gap-5 bg-slate-900/50 p-3 rounded-2xl border border-slate-800 backdrop-blur-md">
+        <button className="text-slate-400 hover:text-white transition-colors flex flex-col items-center gap-1">
+          <HelpCircle size={20} />
+          <span className="text-[10px] font-medium">Support</span>
+        </button>
+        <button className="text-slate-400 hover:text-white transition-colors flex flex-col items-center gap-1">
+          <User size={20} />
+          <span className="text-[10px] font-medium">Account</span>
+        </button>
+        <div className="w-px h-8 bg-slate-700 mx-1"></div>
         <InstallPWA />
       </div>
 
