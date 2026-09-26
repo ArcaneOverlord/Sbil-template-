@@ -33,8 +33,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const lastPanPoint = useRef({ x: 0, y: 0 });
   const [viewportHeight, setViewportHeight] = useState('100vh');
 
-  // NEW: Global Config States
   const [globalBanner, setGlobalBanner] = useState('MTD TOPPERS');
+  const [globalBottomBanner, setGlobalBottomBanner] = useState('KERALA REGION'); // NEW
   const [globalMetric, setGlobalMetric] = useState('Prem');
   const [globalUnit, setGlobalUnit] = useState('Cr');
 
@@ -109,7 +109,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
 
   const handleGlobalUnitChange = (newUnit: string) => {
     setGlobalUnit(newUnit);
-    // Bulk update all achievers when the global default is changed
     setAchievers(prev => prev.map(a => ({ ...a, metricUnit: newUnit })));
   };
 
@@ -169,8 +168,15 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
           className={`transition-transform w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-300 pointer-events-none'}`}
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})` }}
         >
-          {/* Passed the new global states into the Canvas Engine */}
-          <PosterCanvas ref={posterRef} template={template} achievers={achievers} globalBanner={globalBanner} globalMetric={globalMetric} />
+          {/* Passed the bottom banner global state into the Canvas Engine */}
+          <PosterCanvas 
+            ref={posterRef} 
+            template={template} 
+            achievers={achievers} 
+            globalBanner={globalBanner} 
+            globalBottomBanner={globalBottomBanner}
+            globalMetric={globalMetric} 
+          />
         </div>
       </div>
 
@@ -187,22 +193,33 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
 
         <div className="px-6 pb-6 overflow-y-auto flex-1 overscroll-contain">
           
-          {/* NEW: Global Poster Settings Module */}
           <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Settings size={16} className="text-slate-400" />
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Global Settings</h3>
             </div>
             <div className="space-y-4">
-              <div>
-                <label className="text-xs text-slate-500 mb-1.5 block font-medium">Banner Text</label>
-                <select
-                  value={globalBanner} onChange={(e) => setGlobalBanner(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
-                >
-                  <option value="MTD TOPPERS">MTD TOPPERS</option>
-                  <option value="YTD TOPPERS">YTD TOPPERS</option>
-                </select>
+              <div className="flex gap-4">
+                {/* Top Banner Control */}
+                <div className="w-1/2">
+                  <label className="text-xs text-slate-500 mb-1.5 block font-medium">Top Banner</label>
+                  <select
+                    value={globalBanner} onChange={(e) => setGlobalBanner(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
+                  >
+                    <option value="MTD TOPPERS">MTD TOPPERS</option>
+                    <option value="YTD TOPPERS">YTD TOPPERS</option>
+                  </select>
+                </div>
+                {/* Bottom Banner Control */}
+                <div className="w-1/2">
+                  <label className="text-xs text-slate-500 mb-1.5 block font-medium">Bottom Banner</label>
+                  <input
+                    type="text" value={globalBottomBanner} onChange={(e) => setGlobalBottomBanner(e.target.value)}
+                    placeholder="E.g., KERALA REGION"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
+                  />
+                </div>
               </div>
               <div>
                 <label className="text-xs text-slate-500 mb-1.5 block font-medium">Default Master Values</label>
@@ -239,7 +256,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                 <h3 className="font-semibold text-amber-400 mb-3 text-sm">Achiever No.{idx + 1}</h3>
                 <div className="space-y-3">
                   
-                  {/* Name Input */}
                   <input 
                     type="text" value={achiever.name}
                     onFocus={() => handleInputFocus(idx)}
@@ -248,7 +264,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
                   />
                   
-                  {/* The 3-Part Achiever Value UI */}
                   <div className="flex gap-2">
                     <div className="w-1/3 bg-slate-900/80 border border-slate-800 rounded-lg px-2 py-2 text-sm text-slate-500 flex items-center justify-center font-medium">
                       {globalMetric}

@@ -1,4 +1,4 @@
-  export interface TextConfig {
+export interface TextConfig {
   id: string;          
   placeholder: string;
   top: string;         
@@ -8,7 +8,12 @@
   fontSize: string;
   fontWeight: string;
   color: string;
-  transform?: string;  
+  transform?: string;
+  // NEW: Curve & Super-Bold settings
+  isCurved?: boolean;
+  curvePath?: string; 
+  strokeColor?: string;
+  strokeWidth?: string;
 }
 
 export interface ImageConfig {
@@ -36,7 +41,7 @@ export interface Template {
   description: string;
   thumbnail: string;
   background: string;
-  globalTexts?: TextConfig[]; // NEW: For the master YTD/MTD Banner
+  globalTexts?: TextConfig[]; 
   slots: SlotConfig[];
 }
 
@@ -51,13 +56,33 @@ export const posterTemplates: Template[] = [
       { 
         id: 'banner', 
         placeholder: 'MTD TOPPERS', 
-        top: '17%', // Positioned over the top golden ribbon
+        top: '14.5%', // Shifted up slightly to account for the curve's height
         left: '20%', 
         width: '60%', 
-        height: '150px', 
-        fontSize: '220px', 
-        fontWeight: 'bold', 
-        color: '#000000'
+        height: '300px', // Taller box to give the curve room to arc
+        fontSize: '180px', 
+        fontWeight: '900', // Max standard bold
+        color: '#000000',
+        isCurved: true,
+        // Q calculates the arc: M(StartX, StartY) Q(CurveX, CurveY) EndX, EndY
+        curvePath: 'M 100,250 Q 1050,40 2000,250', // Arcs upwards in the middle
+        strokeColor: '#000000',
+        strokeWidth: '6px' // The higher this number, the bolder the text becomes
+      },
+      { 
+        id: 'bottomBanner', 
+        placeholder: 'KERALA REGION', 
+        top: '91%', 
+        left: '20%', 
+        width: '60%', 
+        height: '250px', 
+        fontSize: '140px', 
+        fontWeight: '900', 
+        color: '#000000',
+        isCurved: true,
+        curvePath: 'M 100,60 Q 1050,220 2000,60', // Arcs downwards in the middle
+        strokeColor: '#000000',
+        strokeWidth: '4px'
       }
     ],
     slots: [
