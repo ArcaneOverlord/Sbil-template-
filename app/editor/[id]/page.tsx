@@ -2,12 +2,15 @@
 import { useState, useRef, useEffect, use } from 'react';
 import { toPng } from 'html-to-image';
 import PosterCanvas from '@/components/PosterCanvas';
-import { Download, ImagePlus, ArrowLeft, Maximize, Move, ZoomIn, ZoomOut, Lock, Unlock } from 'lucide-react';
+import { Download, ImagePlus, ArrowLeft, Maximize, Move, ZoomIn, ZoomOut, Lock, Unlock, Settings } from 'lucide-react';
 import { posterTemplates } from '@/lib/templates';
 import { notFound, useRouter } from 'next/navigation';
 
 interface AchieverData {
   [key: string]: any; 
+  name: string;
+  metricValue: string;
+  metricUnit: string;
   image: string | null;
   imgConfig: { scale: number; x: number; y: number };
 }
@@ -21,42 +24,36 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const posterRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
-  
   const [drawerHeight, setDrawerHeight] = useState(15); 
   const [isDraggingDrawer, setIsDraggingDrawer] = useState(false);
-  
   const [isPanEnabled, setIsPanEnabled] = useState(false);
   const [workspaceZoom, setWorkspaceZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 }); 
   const [isPanning, setIsPanning] = useState(false);
   const lastPanPoint = useRef({ x: 0, y: 0 });
-
-  // HARD LOCK: Bypass CSS viewport bugs by forcing the exact pixel height
   const [viewportHeight, setViewportHeight] = useState('100vh');
 
+  // NEW: Global Config States
+  const [globalBanner, setGlobalBanner] = useState('MTD TOPPERS');
+  const [globalMetric, setGlobalMetric] = useState('Prem');
+  const [globalUnit, setGlobalUnit] = useState('Cr');
+
   const [achievers, setAchievers] = useState<AchieverData[]>(
-    template.slots.map(() => ({ name: '', detail: '', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
+    template.slots.map(() => ({ name: '', metricValue: '', metricUnit: 'Cr', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
   );
 
   useEffect(() => {
-    // Exact Pixel Height Engine
     const updateHeight = () => setViewportHeight(`${window.innerHeight}px`);
     updateHeight();
     window.addEventListener('resize', updateHeight);
-
-    // Prevent Back Navigation
     window.history.pushState(null, '', window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, '', window.location.href);
-      if (confirm("Are you sure you want to leave? All progress will be lost.")) {
-        router.push('/gallery');
-      }
+      if (confirm("Are you sure you want to leave? All progress will be lost.")) router.push('/gallery');
     };
     window.addEventListener('popstate', handlePopState);
-    
     const handleBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
     return () => {
       window.removeEventListener('resize', updateHeight);
       window.removeEventListener('popstate', handlePopState);
@@ -72,26 +69,16 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     if (newHeight >= 15 && newHeight <= 65) setDrawerHeight(newHeight);
   };
 
-  const startPan = (e: React.PointerEvent) => {
-    if (!isPanEnabled) return;
-    setIsPanning(true);
-    lastPanPoint.current = { x: e.clientX, y: e.clientY };
-  };
-  
+  const startPan = (e: React.PointerEvent) => { if (!isPanEnabled) return; setIsPanning(true); lastPanPoint.current = { x: e.clientX, y: e.clientY }; };
   const doPan = (e: React.PointerEvent) => {
     if (!isPanning || !isPanEnabled) return;
-    const dx = e.clientX - lastPanPoint.current.x;
-    const dy = e.clientY - lastPanPoint.current.y;
+    const dx = e.clientX - lastPanPoint.current.x; const dy = e.clientY - lastPanPoint.current.y;
     setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
     lastPanPoint.current = { x: e.clientX, y: e.clientY };
   };
-  
   const endPan = () => setIsPanning(false);
 
-  const handleInputFocus = (idx: number) => {
-    setActiveSlot(idx);
-    setDrawerHeight(65); 
-  };
+  const handleInputFocus = (idx: number) => { setActiveSlot(idx); setDrawerHeight(65); };
 
   const handleTextChange = (index: number, field: string, value: string) => {
     const newAchievers = [...achievers];
@@ -120,30 +107,30 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     }
   };
 
+  const handleGlobalUnitChange = (newUnit: string) => {
+    setGlobalUnit(newUnit);
+    // Bulk update all achievers when the global default is changed
+    setAchievers(prev => prev.map(a => ({ ...a, metricUnit: newUnit })));
+  };
+
   const exportPoster = async () => {
     if (!posterRef.current) return;
     try {
       setIsExporting(true);
       setIsPanEnabled(false); 
-      
       await new Promise(r => setTimeout(r, 150)); 
-      
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
       link.download = `${template.id}-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
-    } catch (err) {
-      alert('Export failed.');
-    } finally {
-      setIsExporting(false);
-    }
+    } catch (err) { alert('Export failed.'); } finally { setIsExporting(false); }
   };
 
   return (
     <main 
       className="fixed top-0 left-0 w-full bg-slate-950 text-slate-200 flex flex-col overflow-hidden overscroll-none touch-none"
-      style={{ height: viewportHeight }} // Forces strict adherence to true pixel height
+      style={{ height: viewportHeight }}
       onMouseMove={handleDrawerMove} onTouchMove={handleDrawerMove}
       onMouseUp={() => setIsDraggingDrawer(false)} onTouchEnd={() => setIsDraggingDrawer(false)}
     >
@@ -169,7 +156,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
               {isPanEnabled ? <Unlock size={18} className="mb-1" /> : <Lock size={18} className="mb-1" />}
               {isPanEnabled ? 'MOVE' : 'LOCK'}
            </button>
-
            {isPanEnabled && (
              <div className="flex flex-col gap-1 mt-1 pt-2 border-t border-slate-700/50 animate-in fade-in zoom-in duration-200">
                <button onClick={() => setWorkspaceZoom(z => Math.min(z + 0.2, 3))} className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"><ZoomIn size={18}/></button>
@@ -183,7 +169,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
           className={`transition-transform w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-300 pointer-events-none'}`}
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})` }}
         >
-          <PosterCanvas ref={posterRef} template={template} achievers={achievers} />
+          {/* Passed the new global states into the Canvas Engine */}
+          <PosterCanvas ref={posterRef} template={template} achievers={achievers} globalBanner={globalBanner} globalMetric={globalMetric} />
         </div>
       </div>
 
@@ -199,21 +186,93 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className="px-6 pb-6 overflow-y-auto flex-1 overscroll-contain">
+          
+          {/* NEW: Global Poster Settings Module */}
+          <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Settings size={16} className="text-slate-400" />
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Global Settings</h3>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs text-slate-500 mb-1.5 block font-medium">Banner Text</label>
+                <select
+                  value={globalBanner} onChange={(e) => setGlobalBanner(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
+                >
+                  <option value="MTD TOPPERS">MTD TOPPERS</option>
+                  <option value="YTD TOPPERS">YTD TOPPERS</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-slate-500 mb-1.5 block font-medium">Default Master Values</label>
+                <div className="flex gap-2">
+                  <select
+                    value={globalMetric} onChange={(e) => setGlobalMetric(e.target.value)}
+                    className="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
+                  >
+                    <option value="Prem">Prem</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Rev">Revenue</option>
+                  </select>
+                  <input
+                    type="text" disabled placeholder="Value"
+                    className="w-1/3 bg-slate-900/50 border border-slate-800 rounded-lg px-2 py-2 text-sm text-slate-600 text-center cursor-not-allowed"
+                  />
+                  <select
+                    value={globalUnit} onChange={(e) => handleGlobalUnitChange(e.target.value)}
+                    className="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
+                  >
+                    <option value="Cr">CR</option>
+                    <option value="Lakhs">Lakhs</option>
+                    <option value="Lakh">Lakh</option>
+                    <option value="K">K</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-4">
             {achievers.map((achiever, idx) => (
               <div key={idx} className={`p-4 rounded-xl border transition-all duration-300 ${activeSlot === idx ? 'bg-slate-800 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-slate-950 border-slate-800'}`}>
                 <h3 className="font-semibold text-amber-400 mb-3 text-sm">Achiever No.{idx + 1}</h3>
                 <div className="space-y-3">
-                  {template.slots[idx].textBoxes.map(tb => (
+                  
+                  {/* Name Input */}
+                  <input 
+                    type="text" value={achiever.name}
+                    onFocus={() => handleInputFocus(idx)}
+                    onChange={(e) => handleTextChange(idx, 'name', e.target.value)}
+                    placeholder="Enter Name" 
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
+                  />
+                  
+                  {/* The 3-Part Achiever Value UI */}
+                  <div className="flex gap-2">
+                    <div className="w-1/3 bg-slate-900/80 border border-slate-800 rounded-lg px-2 py-2 text-sm text-slate-500 flex items-center justify-center font-medium">
+                      {globalMetric}
+                    </div>
                     <input 
-                      key={tb.id} type="text" value={achiever[tb.id] || ''}
+                      type="number" value={achiever.metricValue}
                       onFocus={() => handleInputFocus(idx)}
-                      onChange={(e) => handleTextChange(idx, tb.id, e.target.value)}
-                      placeholder={tb.placeholder} 
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
+                      onChange={(e) => handleTextChange(idx, 'metricValue', e.target.value)}
+                      placeholder="Value" 
+                      className="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors text-center" 
                     />
-                  ))}
-                  <label className="flex items-center justify-center w-full h-12 border border-dashed border-slate-600 rounded-lg hover:border-blue-500 hover:bg-slate-800/50 cursor-pointer transition-colors">
+                    <select
+                      value={achiever.metricUnit}
+                      onChange={(e) => handleTextChange(idx, 'metricUnit', e.target.value)}
+                      className="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm focus:outline-none focus:border-blue-500 text-white transition-colors"
+                    >
+                      <option value="Cr">CR</option>
+                      <option value="Lakhs">Lakhs</option>
+                      <option value="Lakh">Lakh</option>
+                      <option value="K">K</option>
+                    </select>
+                  </div>
+
+                  <label className="flex items-center justify-center w-full h-12 border border-dashed border-slate-600 rounded-lg hover:border-blue-500 hover:bg-slate-800/50 cursor-pointer transition-colors mt-2">
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(idx, e)} />
                     <div className="flex items-center gap-2 text-slate-400 text-sm"><ImagePlus size={16} />{achiever.image ? 'Change Photo' : 'Upload Photo'}</div>
                   </label>
@@ -233,7 +292,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                       </div>
                     </div>
                   )}
-
                 </div>
               </div>
             ))}
