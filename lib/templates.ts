@@ -20,6 +20,7 @@ export interface ImageConfig {
   borderColor: string;
   borderWidth: string;
   zIndex: number;
+  opacity: number; 
 }
 
 export interface SlotConfig {
@@ -49,7 +50,7 @@ export const posterTemplates: Template[] = [
         id: 0,
         imageBox: { 
           top: '30%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px',
-          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0 
+          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 
         },
         textBoxes: [
           { id: 'name', placeholder: 'Enter Name', top: '35%', left: '46%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },
@@ -60,7 +61,7 @@ export const posterTemplates: Template[] = [
         id: 1,
         imageBox: { 
           top: '53.5%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px',
-          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0 
+          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 
         },
         textBoxes: [
           { id: 'name', placeholder: 'Enter Name', top: '58.5%', left: '46%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },
@@ -71,7 +72,7 @@ export const posterTemplates: Template[] = [
         id: 2,
         imageBox: { 
           top: '77%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px',
-          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0 
+          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 
         },
         textBoxes: [
           { id: 'name', placeholder: 'Enter Name', top: '82%', left: '46%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },

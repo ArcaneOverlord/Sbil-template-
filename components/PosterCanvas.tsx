@@ -20,16 +20,24 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
       >
         <div 
           ref={ref}
-          className="relative bg-white shadow-2xl"
-          style={{ width: '3508px', height: '4961px', backgroundImage: `url(${template.background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+          className="relative bg-transparent shadow-2xl overflow-hidden"
+          style={{ width: '3508px', height: '4961px' }}
         >
+          
+          <img 
+            src={template.background} 
+            alt="Template" 
+            className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none"
+            style={{ zIndex: 10 }}
+          />
+
           {template.slots.map((slot, index) => {
             const achiever = achievers[index];
             if (!achiever) return null;
 
             return (
               <React.Fragment key={slot.id}>
-                {/* Dynamically Styled Image Box */}
+                
                 <div 
                   className="absolute overflow-hidden"
                   style={{
@@ -42,7 +50,8 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
                     borderColor: slot.imageBox.borderColor,
                     borderWidth: slot.imageBox.borderWidth,
                     borderStyle: 'solid',
-                    zIndex: slot.imageBox.zIndex
+                    zIndex: slot.imageBox.zIndex,
+                    opacity: slot.imageBox.opacity !== undefined ? slot.imageBox.opacity : 1
                   }}
                 >
                   {achiever.image && (
@@ -58,13 +67,19 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
                   )}
                 </div>
 
-                {/* Text Boxes */}
                 {slot.textBoxes.map((tb) => (
                   <div 
                     key={tb.id}
-                    className="absolute z-10 flex flex-col justify-center"
+                    className="absolute flex flex-col justify-center"
                     style={{
-                      top: tb.top, left: tb.left, width: tb.width, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none'
+                      top: tb.top, 
+                      left: tb.left, 
+                      width: tb.width, 
+                      fontSize: tb.fontSize, 
+                      fontWeight: tb.fontWeight, 
+                      color: tb.color, 
+                      transform: tb.transform || 'none',
+                      zIndex: 20 
                     }}
                   >
                     <span style={{ lineHeight: '1.1' }}>
@@ -72,6 +87,7 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
                     </span>
                   </div>
                 ))}
+
               </React.Fragment>
             );
           })}
