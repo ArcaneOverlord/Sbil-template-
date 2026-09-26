@@ -1,5 +1,3 @@
-import { redirect } from "next/dist/server/api-utils";
-
 export interface TextConfig {
   id: string;          
   placeholder: string;
@@ -18,6 +16,10 @@ export interface ImageConfig {
   width: string;
   height: string;
   borderRadius: string;
+  backgroundColor: string;
+  borderColor: string;
+  borderWidth: string;
+  zIndex: number;
 }
 
 export interface SlotConfig {
@@ -45,7 +47,10 @@ export const posterTemplates: Template[] = [
     slots: [
       {
         id: 0,
-        imageBox: { top: '30%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px'},
+        imageBox: { 
+          top: '30%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px',
+          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0 
+        },
         textBoxes: [
           { id: 'name', placeholder: 'Enter Name', top: '35%', left: '46%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },
           { id: 'detail', placeholder: 'Enter Details / Branch', top: '40.5%', left: '46%', width: '1200px', fontSize: '90px', fontWeight: 'normal', color: '#e2e8f0' }
@@ -53,7 +58,10 @@ export const posterTemplates: Template[] = [
       },
       {
         id: 1,
-        imageBox: { top: '53.5%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px' },
+        imageBox: { 
+          top: '53.5%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px',
+          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0 
+        },
         textBoxes: [
           { id: 'name', placeholder: 'Enter Name', top: '58.5%', left: '46%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },
           { id: 'detail', placeholder: 'Enter Details / Branch', top: '64%', left: '46%', width: '1200px', fontSize: '90px', fontWeight: 'normal', color: '#e2e8f0' }
@@ -61,7 +69,10 @@ export const posterTemplates: Template[] = [
       },
       {
         id: 2,
-        imageBox: { top: '77%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px' },
+        imageBox: { 
+          top: '77%', left: '26.5%', width: '700px', height: '750px', borderRadius: '40px',
+          backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0 
+        },
         textBoxes: [
           { id: 'name', placeholder: 'Enter Name', top: '82%', left: '46%', width: '1200px', fontSize: '140px', fontWeight: 'bold', color: '#ffffff' },
           { id: 'detail', placeholder: 'Enter Details / Branch', top: '87.5%', left: '46%', width: '1200px', fontSize: '90px', fontWeight: 'normal', color: '#e2e8f0' }

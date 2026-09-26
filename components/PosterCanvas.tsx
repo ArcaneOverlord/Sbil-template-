@@ -29,10 +29,20 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
 
             return (
               <React.Fragment key={slot.id}>
+                {/* Dynamically Styled Image Box */}
                 <div 
-                  className="absolute overflow-hidden bg-gray-200 z-0"
+                  className="absolute overflow-hidden"
                   style={{
-                    top: slot.imageBox.top, left: slot.imageBox.left, width: slot.imageBox.width, height: slot.imageBox.height, borderRadius: slot.imageBox.borderRadius
+                    top: slot.imageBox.top, 
+                    left: slot.imageBox.left, 
+                    width: slot.imageBox.width, 
+                    height: slot.imageBox.height, 
+                    borderRadius: slot.imageBox.borderRadius,
+                    backgroundColor: slot.imageBox.backgroundColor,
+                    borderColor: slot.imageBox.borderColor,
+                    borderWidth: slot.imageBox.borderWidth,
+                    borderStyle: 'solid',
+                    zIndex: slot.imageBox.zIndex
                   }}
                 >
                   {achiever.image && (
@@ -48,6 +58,7 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, achiev
                   )}
                 </div>
 
+                {/* Text Boxes */}
                 {slot.textBoxes.map((tb) => (
                   <div 
                     key={tb.id}
