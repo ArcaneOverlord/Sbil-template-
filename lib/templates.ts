@@ -56,7 +56,7 @@ export const posterTemplates: Template[] = [
       { 
         id: 'banner', 
         placeholder: 'MTD TOPPERS', 
-        top: '14.5%', // Shifted up slightly to account for the curve's height
+        top: '17.5%', // Shifted up slightly to account for the curve's height
         left: '20%', 
         width: '60%', 
         height: '300px', // Taller box to give the curve room to arc
@@ -65,7 +65,7 @@ export const posterTemplates: Template[] = [
         color: '#000000',
         isCurved: true,
         // Q calculates the arc: M(StartX, StartY) Q(CurveX, CurveY) EndX, EndY
-        curvePath: 'M 100,250 Q 1050,40 2000,250', // Arcs upwards in the middle
+        curvePath: 'M 100,250 Q 1050,30 2000,250', // Arcs upwards in the middle
         strokeColor: '#000000',
         strokeWidth: '6px' // The higher this number, the bolder the text becomes
       },
