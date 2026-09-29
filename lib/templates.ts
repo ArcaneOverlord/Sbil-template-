@@ -9,11 +9,21 @@ export interface TextConfig {
   fontWeight: string;
   color: string;
   transform?: string;
-  // NEW: Curve & Super-Bold settings
+  
+  // Curve & Super-Bold settings
   isCurved?: boolean;
   curvePath?: string; 
   strokeColor?: string;
   strokeWidth?: string;
+
+  // NEW: Gradient Settings
+  isGradient?: boolean;
+  gradientColors?: { from: string; to: string; direction?: string };
+  
+  // NEW: Entered Value Emphasis Settings
+  valueFontSize?: string;
+  valueFontWeight?: string;
+  valueColor?: string;
 }
 
 export interface ImageConfig {
@@ -56,18 +66,17 @@ export const posterTemplates: Template[] = [
       { 
         id: 'banner', 
         placeholder: 'MTD TOPPERS', 
-        top: '16.5%', // Shifted up slightly to account for the curve's height
+        top: '16.5%',
         left: '20%', 
         width: '60%', 
-        height: '300px', // Taller box to give the curve room to arc
+        height: '300px', 
         fontSize: '200px', 
-        fontWeight: '900', // Max standard bold
+        fontWeight: '900', 
         color: '#000000',
         isCurved: true,
-        // Q calculates the arc: M(StartX, StartY) Q(CurveX, CurveY) EndX, EndY
-        curvePath: 'M 100,250 Q 1050,80 2000,250', // Arcs upwards in the middle
+        curvePath: 'M 100,250 Q 1050,80 2000,250', 
         strokeColor: '#000000',
-        strokeWidth: '6px' // The higher this number, the bolder the text becomes
+        strokeWidth: '6px' 
       },
       { 
         id: 'bottomBanner', 
@@ -80,7 +89,7 @@ export const posterTemplates: Template[] = [
         fontWeight: '900', 
         color: '#000000',
         isCurved: true,
-        curvePath: 'M 100,250 Q 1050,80 2000,250', // Arcs downwards in the middle
+        curvePath: 'M 100,250 Q 1050,80 2000,250',
         strokeColor: '#000000',
         strokeWidth: '4px'
       }
@@ -93,8 +102,14 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '34.5%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Value', top: '41.5%', left: '48%', width: '1600px', height: '150px', fontSize: '140px', fontWeight: 'bold', color: '#e2e8f0' }
+          { 
+            id: 'name', placeholder: 'Enter Name', top: '34.5%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff',
+            isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } // Gold Gradient
+          },
+          { 
+            id: 'detail', placeholder: 'Enter Value', top: '41.5%', left: '48%', width: '1600px', height: '150px', fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
+            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff' // Makes the entered value massive and white
+          }
         ]
       },
       {
@@ -104,8 +119,14 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '56%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Value', top: '62.5%', left: '48%', width: '1600px', height: '150px', fontSize: '140px', fontWeight: 'bold', color: '#e2e8f0' }
+          { 
+            id: 'name', placeholder: 'Enter Name', top: '56%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff',
+            isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
+          },
+          { 
+            id: 'detail', placeholder: 'Enter Value', top: '62.5%', left: '48%', width: '1600px', height: '150px', fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
+            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff'
+          }
         ]
       },
       {
@@ -115,8 +136,14 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '76.3%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Value', top: '82.5%', left: '48%', width: '1600px', height: '150px', fontSize: '140px', fontWeight: 'bold', color: '#e2e8f0' }
+          { 
+            id: 'name', placeholder: 'Enter Name', top: '76.3%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff',
+            isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
+          },
+          { 
+            id: 'detail', placeholder: 'Enter Value', top: '82.5%', left: '48%', width: '1600px', height: '150px', fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
+            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff'
+          }
         ]
       }
     ]

@@ -1,3 +1,4 @@
+export default PosterCanvas;
 "use client";
 import React, { forwardRef } from 'react';
 import { Template } from '@/lib/templates';
@@ -41,10 +42,8 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   transform: tb.transform || 'none'
                 }}
               >
-                {/* SVG Curve Engine */}
                 {tb.isCurved && tb.curvePath ? (
                   <svg width="100%" height="100%" viewBox="0 0 2100 300" style={{ overflow: 'visible' }}>
-                    {/* The transparent path the text follows */}
                     <path id={`curve-${tb.id}`} d={tb.curvePath} fill="transparent" />
                     <text 
                       fill={tb.color} 
@@ -52,7 +51,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                       strokeWidth={tb.strokeWidth} 
                       style={{ fontSize: tb.fontSize, fontWeight: tb.fontWeight }}
                     >
-                      {/* Centers the text perfectly on the curve */}
                       <textPath href={`#curve-${tb.id}`} startOffset="50%" textAnchor="middle">
                         {textValue}
                       </textPath>
@@ -85,22 +83,21 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                 >
                   {achiever.image && (
                     <img 
-                      src={achiever.image} alt="Achiever" className="w-full h-full object-cover"
+                      src={achiever.image} alt="Achiever" 
+                      className="w-full h-full object-contain" // FIX: Switched from object-cover to object-contain
                       style={{ transform: `scale(${achiever.imgConfig.scale}) translate(${achiever.imgConfig.x}px, ${achiever.imgConfig.y}px)`, transformOrigin: 'center' }}
                     />
                   )}
                 </div>
 
                 {slot.textBoxes.map((tb) => {
-                  let textToShow = achiever[tb.id] || tb.placeholder;
                   
-                  if (tb.id === 'detail') {
-                    if (achiever.metricValue) {
-                      textToShow = `${globalMetric}: ${achiever.metricValue} ${achiever.metricUnit}`;
-                    } else {
-                      textToShow = tb.placeholder;
-                    }
-                  }
+                  // Setup Gradient CSS if enabled
+                  const gradientStyle = tb.isGradient && tb.gradientColors ? {
+                    backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  } : {};
 
                   return (
                     <div 
@@ -114,9 +111,25 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                         backgroundColor: DEBUG_MODE ? 'rgba(239, 68, 68, 0.2)' : 'transparent'
                       }}
                     >
-                      <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word' }}>
-                        {textToShow}
-                      </span>
+                      {tb.id === 'detail' && achiever.metricValue ? (
+                        // NEW: Isolates the user-entered value so it can be styled independently
+                        <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>
+                          {globalMetric}: 
+                          <span style={{ 
+                            fontSize: tb.valueFontSize || tb.fontSize, 
+                            fontWeight: tb.valueFontWeight || tb.fontWeight, 
+                            color: tb.valueColor || tb.color,
+                            WebkitTextFillColor: tb.valueColor || 'unset' // Ensures gradient doesn't overwrite specific solid colors
+                          }}>
+                            {` ${achiever.metricValue} `}
+                          </span>
+                          {achiever.metricUnit}
+                        </span>
+                      ) : (
+                        <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>
+                          {achiever[tb.id] || tb.placeholder}
+                        </span>
+                      )}
                     </div>
                   );
                 })}
