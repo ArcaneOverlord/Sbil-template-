@@ -1,4 +1,3 @@
-export default PosterCanvas;
 "use client";
 import React, { forwardRef } from 'react';
 import { Template } from '@/lib/templates';
