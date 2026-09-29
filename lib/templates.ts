@@ -72,15 +72,15 @@ export const posterTemplates: Template[] = [
       { 
         id: 'bottomBanner', 
         placeholder: 'TEAM KATTAKADA', 
-        top: '91%', 
+        top: '92%', 
         left: '20%', 
         width: '60%', 
         height: '250px', 
-        fontSize: '140px', 
+        fontSize: '160px', 
         fontWeight: '900', 
         color: '#000000',
         isCurved: true,
-        curvePath: 'M 100,60 Q 1050,80 2000,60', // Arcs downwards in the middle
+        curvePath: 'M 100,60 Q 1050,-80 2000,60', // Arcs downwards in the middle
         strokeColor: '#000000',
         strokeWidth: '4px'
       }
