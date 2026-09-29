@@ -76,7 +76,7 @@ export const posterTemplates: Template[] = [
         left: '20%', 
         width: '60%', 
         height: '250px', 
-        fontSize: '160px', 
+        fontSize: '140px', 
         fontWeight: '900', 
         color: '#000000',
         isCurved: true,
@@ -93,8 +93,8 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '34.5%', left: '48%', width: '1600px', height: '250px', fontSize: '130px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Value', top: '41.5%', left: '48%', width: '1600px', height: '150px', fontSize: '120px', fontWeight: 'normal', color: '#e2e8f0' }
+          { id: 'name', placeholder: 'Enter Name', top: '34.5%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff' },
+          { id: 'detail', placeholder: 'Enter Value', top: '41.5%', left: '48%', width: '1600px', height: '150px', fontSize: '140px', fontWeight: 'bold', color: '#e2e8f0' }
         ]
       },
       {
@@ -104,8 +104,8 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '56%', left: '48%', width: '1600px', height: '250px', fontSize: '130px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Value', top: '62.5%', left: '48%', width: '1600px', height: '150px', fontSize: '120px', fontWeight: 'normal', color: '#e2e8f0' }
+          { id: 'name', placeholder: 'Enter Name', top: '56%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff' },
+          { id: 'detail', placeholder: 'Enter Value', top: '62.5%', left: '48%', width: '1600px', height: '150px', fontSize: '140px', fontWeight: 'bold', color: '#e2e8f0' }
         ]
       },
       {
@@ -115,8 +115,8 @@ export const posterTemplates: Template[] = [
           backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 
         },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '76%', left: '48%', width: '1600px', height: '250px', fontSize: '130px', fontWeight: 'bold', color: '#ffffff' },
-          { id: 'detail', placeholder: 'Enter Value', top: '82.5%', left: '48%', width: '1600px', height: '150px', fontSize: '120px', fontWeight: 'normal', color: '#e2e8f0' }
+          { id: 'name', placeholder: 'Enter Name', top: '76.3%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff' },
+          { id: 'detail', placeholder: 'Enter Value', top: '82.5%', left: '48%', width: '1600px', height: '150px', fontSize: '140px', fontWeight: 'bold', color: '#e2e8f0' }
         ]
       }
     ]

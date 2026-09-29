@@ -14,7 +14,7 @@ interface PosterProps {
   }[];
 }
 
-const DEBUG_MODE = true; 
+const DEBUG_MODE = false; 
 
 const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, globalBanner, globalBottomBanner, globalMetric, achievers }, ref) => {
   return (
