@@ -72,7 +72,7 @@ export const posterTemplates: Template[] = [
       { 
         id: 'bottomBanner', 
         placeholder: 'TEAM KATTAKADA', 
-        top: '92%', 
+        top: '90%', 
         left: '20%', 
         width: '60%', 
         height: '250px', 
