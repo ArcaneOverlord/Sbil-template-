@@ -80,7 +80,7 @@ export const posterTemplates: Template[] = [
         fontWeight: '900', 
         color: '#000000',
         isCurved: true,
-        curvePath: 'M 100,60 Q 1050,-80 2000,60', // Arcs downwards in the middle
+        curvePath: 'M 100,250 Q 1050,80 2000,250', // Arcs downwards in the middle
         strokeColor: '#000000',
         strokeWidth: '4px'
       }
