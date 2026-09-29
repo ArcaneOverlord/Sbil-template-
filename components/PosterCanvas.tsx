@@ -83,7 +83,7 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   {achiever.image && (
                     <img 
                       src={achiever.image} alt="Achiever" 
-                      className="w-full h-full object-contain" // FIX: Switched from object-cover to object-contain
+                      className="w-full h-full object-contain" 
                       style={{ transform: `scale(${achiever.imgConfig.scale}) translate(${achiever.imgConfig.x}px, ${achiever.imgConfig.y}px)`, transformOrigin: 'center' }}
                     />
                   )}
@@ -91,9 +91,23 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
 
                 {slot.textBoxes.map((tb) => {
                   
-                  // Setup Gradient CSS if enabled
+                  // Primary Text Gradient
                   const gradientStyle = tb.isGradient && tb.gradientColors ? {
                     backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  } : {};
+
+                  // Prefix Gradient
+                  const prefixGradientStyle = tb.isPrefixGradient && tb.prefixGradientColors ? {
+                    backgroundImage: `linear-gradient(${tb.prefixGradientColors.direction || 'to right'}, ${tb.prefixGradientColors.from}, ${tb.prefixGradientColors.to})`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  } : {};
+
+                  // Unit Gradient
+                  const unitGradientStyle = tb.isUnitGradient && tb.unitGradientColors ? {
+                    backgroundImage: `linear-gradient(${tb.unitGradientColors.direction || 'to right'}, ${tb.unitGradientColors.from}, ${tb.unitGradientColors.to})`,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                   } : {};
@@ -111,18 +125,40 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                       }}
                     >
                       {tb.id === 'detail' && achiever.metricValue ? (
-                        // NEW: Isolates the user-entered value so it can be styled independently
                         <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>
-                          {globalMetric}: 
+                          
+                          {/* 1. Prefix (e.g., "Prem:") */}
+                          <span style={{ 
+                            fontSize: tb.prefixFontSize || tb.fontSize, 
+                            fontWeight: tb.prefixFontWeight || tb.fontWeight, 
+                            color: tb.prefixColor || tb.color,
+                            WebkitTextFillColor: tb.isPrefixGradient ? 'transparent' : (tb.prefixColor || 'unset'),
+                            ...prefixGradientStyle
+                          }}>
+                            {globalMetric}: 
+                          </span>
+                          
+                          {/* 2. Entered Metric Value */}
                           <span style={{ 
                             fontSize: tb.valueFontSize || tb.fontSize, 
                             fontWeight: tb.valueFontWeight || tb.fontWeight, 
                             color: tb.valueColor || tb.color,
-                            WebkitTextFillColor: tb.valueColor || 'unset' // Ensures gradient doesn't overwrite specific solid colors
+                            WebkitTextFillColor: tb.valueColor || 'unset' 
                           }}>
                             {` ${achiever.metricValue} `}
                           </span>
-                          {achiever.metricUnit}
+                          
+                          {/* 3. Unit (e.g., "Cr") */}
+                          <span style={{ 
+                            fontSize: tb.unitFontSize || tb.fontSize, 
+                            fontWeight: tb.unitFontWeight || tb.fontWeight, 
+                            color: tb.unitColor || tb.color,
+                            WebkitTextFillColor: tb.isUnitGradient ? 'transparent' : (tb.unitColor || 'unset'),
+                            ...unitGradientStyle
+                          }}>
+                            {achiever.metricUnit}
+                          </span>
+                          
                         </span>
                       ) : (
                         <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>

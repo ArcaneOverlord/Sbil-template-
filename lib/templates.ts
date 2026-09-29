@@ -16,14 +16,28 @@ export interface TextConfig {
   strokeColor?: string;
   strokeWidth?: string;
 
-  // NEW: Gradient Settings
+  // Main Text Gradient Settings
   isGradient?: boolean;
   gradientColors?: { from: string; to: string; direction?: string };
   
-  // NEW: Entered Value Emphasis Settings
+  // Entered Value Emphasis Settings
   valueFontSize?: string;
   valueFontWeight?: string;
   valueColor?: string;
+
+  // NEW: Prefix (e.g., "Prem:") Settings
+  prefixFontSize?: string;
+  prefixFontWeight?: string;
+  prefixColor?: string;
+  isPrefixGradient?: boolean;
+  prefixGradientColors?: { from: string; to: string; direction?: string };
+
+  // NEW: Unit (e.g., "Cr") Settings
+  unitFontSize?: string;
+  unitFontWeight?: string;
+  unitColor?: string;
+  isUnitGradient?: boolean;
+  unitGradientColors?: { from: string; to: string; direction?: string };
 }
 
 export interface ImageConfig {
@@ -104,11 +118,17 @@ export const posterTemplates: Template[] = [
         textBoxes: [
           { 
             id: 'name', placeholder: 'Enter Name', top: '34.5%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff',
-            isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } // Gold Gradient
+            isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
           },
           { 
-            id: 'detail', placeholder: 'Enter Value', top: '41.5%', left: '48%', width: '1600px', height: '150px', fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
-            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff' // Makes the entered value massive and white
+            id: 'detail', placeholder: 'Enter Value', top: '41.5%', left: '48%', width: '1600px', height: '150px', 
+            fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
+            // Specific styling for the entered number
+            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff',
+            // Specific styling for "Prem:" 
+            prefixFontSize: '100px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
+            // Specific styling for "Cr"
+            unitFontSize: '110px', unitFontWeight: 'bold', unitColor: '#fef08a'
           }
         ]
       },
@@ -124,8 +144,11 @@ export const posterTemplates: Template[] = [
             isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
           },
           { 
-            id: 'detail', placeholder: 'Enter Value', top: '62.5%', left: '48%', width: '1600px', height: '150px', fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
-            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff'
+            id: 'detail', placeholder: 'Enter Value', top: '62.5%', left: '48%', width: '1600px', height: '150px', 
+            fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
+            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff',
+            prefixFontSize: '100px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
+            unitFontSize: '110px', unitFontWeight: 'bold', unitColor: '#fef08a'
           }
         ]
       },
@@ -141,8 +164,11 @@ export const posterTemplates: Template[] = [
             isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
           },
           { 
-            id: 'detail', placeholder: 'Enter Value', top: '82.5%', left: '48%', width: '1600px', height: '150px', fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
-            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff'
+            id: 'detail', placeholder: 'Enter Value', top: '82.5%', left: '48%', width: '1600px', height: '150px', 
+            fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
+            valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff',
+            prefixFontSize: '100px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
+            unitFontSize: '110px', unitFontWeight: 'bold', unitColor: '#fef08a'
           }
         ]
       }
