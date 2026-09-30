@@ -24,7 +24,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
           
           <img src={template.background} alt="Template" className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: 10 }} />
 
-          {/* RENDER GLOBAL TEXTS (Top & Bottom Banners) */}
           {template.globalTexts && template.globalTexts.map((tb) => {
             const textValue = tb.id === 'banner' ? globalBanner : (tb.id === 'bottomBanner' ? globalBottomBanner : tb.placeholder);
             
@@ -44,27 +43,17 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                 {tb.isCurved && tb.curvePath ? (
                   <svg width="100%" height="100%" viewBox="0 0 2100 300" style={{ overflow: 'visible' }}>
                     <path id={`curve-${tb.id}`} d={tb.curvePath} fill="transparent" />
-                    <text 
-                      fill={tb.color} 
-                      stroke={tb.strokeColor} 
-                      strokeWidth={tb.strokeWidth} 
-                      style={{ fontSize: tb.fontSize, fontWeight: tb.fontWeight }}
-                    >
-                      <textPath href={`#curve-${tb.id}`} startOffset="50%" textAnchor="middle">
-                        {textValue}
-                      </textPath>
+                    <text fill={tb.color} stroke={tb.strokeColor} strokeWidth={tb.strokeWidth} style={{ fontSize: tb.fontSize, fontWeight: tb.fontWeight }}>
+                      <textPath href={`#curve-${tb.id}`} startOffset="50%" textAnchor="middle">{textValue}</textPath>
                     </text>
                   </svg>
                 ) : (
-                  <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word' }}>
-                    {textValue}
-                  </span>
+                  <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word' }}>{textValue}</span>
                 )}
               </div>
             );
           })}
 
-          {/* RENDER INDIVIDUAL ACHIEVER SLOTS */}
           {template.slots.map((slot, index) => {
             const achiever = achievers[index];
             if (!achiever) return null;
@@ -89,27 +78,30 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   )}
                 </div>
 
-                {slot.textBoxes.map((tb) => {
+                {slot.textBoxes.map((baseTb) => {
                   
-                  // Primary Text Gradient
+                  // THEME MERGE: Overlays the specific slot coordinates on top of the template's default master styles
+                  const tb = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
+                  
                   const gradientStyle = tb.isGradient && tb.gradientColors ? {
                     backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                   } : {};
 
-                  // Prefix Gradient
                   const prefixGradientStyle = tb.isPrefixGradient && tb.prefixGradientColors ? {
                     backgroundImage: `linear-gradient(${tb.prefixGradientColors.direction || 'to right'}, ${tb.prefixGradientColors.from}, ${tb.prefixGradientColors.to})`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                   } : {};
 
-                  // Unit Gradient
+                  // NEW: Value Gradient Processing
+                  const valueGradientStyle = tb.isValueGradient && tb.valueGradientColors ? {
+                    backgroundImage: `linear-gradient(${tb.valueGradientColors.direction || 'to right'}, ${tb.valueGradientColors.from}, ${tb.valueGradientColors.to})`,
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                  } : {};
+
                   const unitGradientStyle = tb.isUnitGradient && tb.unitGradientColors ? {
                     backgroundImage: `linear-gradient(${tb.unitGradientColors.direction || 'to right'}, ${tb.unitGradientColors.from}, ${tb.unitGradientColors.to})`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                   } : {};
 
                   return (
@@ -127,33 +119,26 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                       {tb.id === 'detail' && achiever.metricValue ? (
                         <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>
                           
-                          {/* 1. Prefix (e.g., "Prem:") */}
                           <span style={{ 
-                            fontSize: tb.prefixFontSize || tb.fontSize, 
-                            fontWeight: tb.prefixFontWeight || tb.fontWeight, 
-                            color: tb.prefixColor || tb.color,
-                            WebkitTextFillColor: tb.isPrefixGradient ? 'transparent' : (tb.prefixColor || 'unset'),
+                            fontSize: tb.prefixFontSize || tb.fontSize, fontWeight: tb.prefixFontWeight || tb.fontWeight, 
+                            color: tb.prefixColor || tb.color, WebkitTextFillColor: tb.isPrefixGradient ? 'transparent' : (tb.prefixColor || tb.color || 'unset'),
                             ...prefixGradientStyle
                           }}>
                             {globalMetric}: 
                           </span>
                           
-                          {/* 2. Entered Metric Value */}
+                          {/* NEW: Value Gradient Output */}
                           <span style={{ 
-                            fontSize: tb.valueFontSize || tb.fontSize, 
-                            fontWeight: tb.valueFontWeight || tb.fontWeight, 
-                            color: tb.valueColor || tb.color,
-                            WebkitTextFillColor: tb.valueColor || 'unset' 
+                            fontSize: tb.valueFontSize || tb.fontSize, fontWeight: tb.valueFontWeight || tb.fontWeight, 
+                            color: tb.valueColor || tb.color, WebkitTextFillColor: tb.isValueGradient ? 'transparent' : (tb.valueColor || tb.color || 'unset'),
+                            ...valueGradientStyle
                           }}>
                             {` ${achiever.metricValue} `}
                           </span>
                           
-                          {/* 3. Unit (e.g., "Cr") */}
                           <span style={{ 
-                            fontSize: tb.unitFontSize || tb.fontSize, 
-                            fontWeight: tb.unitFontWeight || tb.fontWeight, 
-                            color: tb.unitColor || tb.color,
-                            WebkitTextFillColor: tb.isUnitGradient ? 'transparent' : (tb.unitColor || 'unset'),
+                            fontSize: tb.unitFontSize || tb.fontSize, fontWeight: tb.unitFontWeight || tb.fontWeight, 
+                            color: tb.unitColor || tb.color, WebkitTextFillColor: tb.isUnitGradient ? 'transparent' : (tb.unitColor || tb.color || 'unset'),
                             ...unitGradientStyle
                           }}>
                             {achiever.metricUnit}
