@@ -34,12 +34,12 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [viewportHeight, setViewportHeight] = useState('100vh');
 
   const [globalBanner, setGlobalBanner] = useState('MTD TOPPERS');
-  const [globalBottomBanner, setGlobalBottomBanner] = useState('KERALA REGION'); // NEW
+  const [globalBottomBanner, setGlobalBottomBanner] = useState('TEAM KATTAKADA');
   const [globalMetric, setGlobalMetric] = useState('Prem');
-  const [globalUnit, setGlobalUnit] = useState('Cr');
+  const [globalUnit, setGlobalUnit] = useState('Lakh'); // Changed default to Lakh
 
   const [achievers, setAchievers] = useState<AchieverData[]>(
-    template.slots.map(() => ({ name: '', metricValue: '', metricUnit: 'Cr', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
+    template.slots.map(() => ({ name: '', metricValue: '', metricUnit: 'Lakh', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
   );
 
   useEffect(() => {
@@ -117,6 +117,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     try {
       setIsExporting(true);
       setIsPanEnabled(false); 
+      // The canvas will now instantly drop the debug borders because isExporting is true
       await new Promise(r => setTimeout(r, 150)); 
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
@@ -168,7 +169,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
           className={`transition-transform w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-300 pointer-events-none'}`}
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})` }}
         >
-          {/* Passed the bottom banner global state into the Canvas Engine */}
           <PosterCanvas 
             ref={posterRef} 
             template={template} 
@@ -176,6 +176,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             globalBanner={globalBanner} 
             globalBottomBanner={globalBottomBanner}
             globalMetric={globalMetric} 
+            isExporting={isExporting} 
           />
         </div>
       </div>
@@ -200,7 +201,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             </div>
             <div className="space-y-4">
               <div className="flex gap-4">
-                {/* Top Banner Control */}
                 <div className="w-1/2">
                   <label className="text-xs text-slate-500 mb-1.5 block font-medium">Top Banner</label>
                   <select
@@ -211,11 +211,12 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     <option value="YTD TOPPERS">YTD TOPPERS</option>
                   </select>
                 </div>
-                {/* Bottom Banner Control */}
                 <div className="w-1/2">
                   <label className="text-xs text-slate-500 mb-1.5 block font-medium">Bottom Banner</label>
                   <input
-                    type="text" value={globalBottomBanner} onChange={(e) => setGlobalBottomBanner(e.target.value)}
+                    type="text" 
+                    value={globalBottomBanner} 
+                    onChange={(e) => setGlobalBottomBanner(e.target.value.toUpperCase())} // Forces strictly uppercase text
                     placeholder="E.g., KERALA REGION"
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
                   />

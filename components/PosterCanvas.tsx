@@ -7,6 +7,7 @@ interface PosterProps {
   globalBanner: string;
   globalBottomBanner: string;
   globalMetric: string;
+  isExporting: boolean; // NEW: Tells the canvas if an export is in progress
   achievers: {
     [key: string]: any; 
     image: string | null;
@@ -14,9 +15,14 @@ interface PosterProps {
   }[];
 }
 
-const DEBUG_MODE = false; 
+// You can leave this as true. It will now automatically hide itself when exporting.
+const DEBUG_MODE = true; 
 
-const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, globalBanner, globalBottomBanner, globalMetric, achievers }, ref) => {
+const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, globalBanner, globalBottomBanner, globalMetric, isExporting, achievers }, ref) => {
+  
+  // Only show debug boxes if DEBUG_MODE is true AND we are not currently exporting
+  const showDebug = DEBUG_MODE && !isExporting;
+
   return (
     <div className="relative flex justify-center items-center w-full h-full pointer-events-none">
       <div className="origin-center" style={{ transform: 'scale(0.10)', width: '3508px', height: '4961px' }}>
@@ -35,8 +41,8 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   top: tb.top, left: tb.left, width: tb.width, height: tb.height, 
                   fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20,
                   WebkitTextStroke: tb.strokeWidth && tb.strokeColor && !tb.isCurved ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined,
-                  border: DEBUG_MODE ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none',
-                  backgroundColor: DEBUG_MODE ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
+                  border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none',
+                  backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
                   transform: tb.transform || 'none'
                 }}
               >
@@ -80,7 +86,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
 
                 {slot.textBoxes.map((baseTb) => {
                   
-                  // THEME MERGE: Overlays the specific slot coordinates on top of the template's default master styles
                   const tb = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
                   
                   const gradientStyle = tb.isGradient && tb.gradientColors ? {
@@ -93,7 +98,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                   } : {};
 
-                  // NEW: Value Gradient Processing
                   const valueGradientStyle = tb.isValueGradient && tb.valueGradientColors ? {
                     backgroundImage: `linear-gradient(${tb.valueGradientColors.direction || 'to right'}, ${tb.valueGradientColors.from}, ${tb.valueGradientColors.to})`,
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
@@ -112,11 +116,11 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                         top: tb.top, left: tb.left, width: tb.width, height: tb.height, 
                         fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none', zIndex: 20,
                         WebkitTextStroke: tb.strokeWidth && tb.strokeColor ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined,
-                        border: DEBUG_MODE ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none',
-                        backgroundColor: DEBUG_MODE ? 'rgba(239, 68, 68, 0.2)' : 'transparent'
+                        border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none',
+                        backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : 'transparent'
                       }}
                     >
-                      {tb.id === 'detail' && achiever.metricValue ? (
+                      {tb.id === 'detail' ? (
                         <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>
                           
                           <span style={{ 
@@ -127,13 +131,13 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                             {globalMetric}: 
                           </span>
                           
-                          {/* NEW: Value Gradient Output */}
                           <span style={{ 
                             fontSize: tb.valueFontSize || tb.fontSize, fontWeight: tb.valueFontWeight || tb.fontWeight, 
                             color: tb.valueColor || tb.color, WebkitTextFillColor: tb.isValueGradient ? 'transparent' : (tb.valueColor || tb.color || 'unset'),
                             ...valueGradientStyle
                           }}>
-                            {` ${achiever.metricValue} `}
+                            {/* Injects "00.00" if metricValue is empty */}
+                            {` ${achiever.metricValue || '00.00'} `}
                           </span>
                           
                           <span style={{ 
