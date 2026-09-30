@@ -118,7 +118,7 @@ export const posterTemplates: Template[] = [
         textBoxes: [
           { 
             id: 'name', placeholder: 'Enter Name', top: '34.5%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff',
-            isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
+            isGradient: false, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
           },
           { 
             id: 'detail', placeholder: 'Enter Value', top: '41.5%', left: '48%', width: '1600px', height: '150px', 
@@ -126,7 +126,7 @@ export const posterTemplates: Template[] = [
             // Specific styling for the entered number
             valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff',
             // Specific styling for "Prem:" 
-            prefixFontSize: '100px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
+            prefixFontSize: '110px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
             // Specific styling for "Cr"
             unitFontSize: '110px', unitFontWeight: 'bold', unitColor: '#fef08a'
           }
@@ -141,13 +141,13 @@ export const posterTemplates: Template[] = [
         textBoxes: [
           { 
             id: 'name', placeholder: 'Enter Name', top: '56%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff',
-            isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
+            isGradient: false, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
           },
           { 
             id: 'detail', placeholder: 'Enter Value', top: '62.5%', left: '48%', width: '1600px', height: '150px', 
             fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
             valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff',
-            prefixFontSize: '100px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
+            prefixFontSize: '110px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
             unitFontSize: '110px', unitFontWeight: 'bold', unitColor: '#fef08a'
           }
         ]
@@ -161,13 +161,13 @@ export const posterTemplates: Template[] = [
         textBoxes: [
           { 
             id: 'name', placeholder: 'Enter Name', top: '76.3%', left: '48%', width: '1600px', height: '250px', fontSize: '160px', fontWeight: 'bold', color: '#ffffff',
-            isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
+            isGradient: false, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
           },
           { 
             id: 'detail', placeholder: 'Enter Value', top: '82.5%', left: '48%', width: '1600px', height: '150px', 
             fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
             valueFontSize: '160px', valueFontWeight: '900', valueColor: '#ffffff',
-            prefixFontSize: '100px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
+            prefixFontSize: '110px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1',
             unitFontSize: '110px', unitFontWeight: 'bold', unitColor: '#fef08a'
           }
         ]
