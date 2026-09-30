@@ -79,8 +79,8 @@ export const posterTemplates: Template[] = [
     id: 'sbi-life-top-3',
     name: 'Top 3 Achievers (Gold)',
     description: 'Standard MTD/YTD recognition poster for top 3 sales performers.',
-    thumbnail: '/1000114310.png',
-    background: '/1000114310.png',
+    thumbnail: '/v1.png',
+    background: '/v1.png',
     
     // NEW MASTER THEME: Set your common sizes, colors, and gradients here!
     defaultTextStyles: {
