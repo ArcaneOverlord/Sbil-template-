@@ -98,7 +98,7 @@ export const posterTemplates: Template[] = [
         color: '#94a3b8',
         
         // Value styling
-        valueFontSize: '160px',
+        valueFontSize: '180px',
         valueFontWeight: '900',
         valueColor: '#ffffff',
         isValueGradient: false,
@@ -112,7 +112,7 @@ export const posterTemplates: Template[] = [
         prefixGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
         
         // Unit styling
-        unitFontSize: '110px',
+        unitFontSize: '120px',
         unitFontWeight: 'bold',
         unitColor: '#fef08a',
         isUnitGradient: false,
