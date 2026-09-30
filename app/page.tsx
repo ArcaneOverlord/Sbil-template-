@@ -37,7 +37,7 @@ export default function Home() {
           <ImageIcon size={48} className="text-white" />
         </div>
         <h1 className="text-4xl font-bold text-white tracking-tight mb-2">PosterGen</h1>
-        <p className="text-slate-400">SBI Life Achievement Posters</p>
+        <p className="text-slate-400">Achievement Posters</p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-6 w-full max-w-2xl px-4 relative z-10">
