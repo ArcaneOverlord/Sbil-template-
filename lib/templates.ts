@@ -101,8 +101,8 @@ export const posterTemplates: Template[] = [
         valueFontSize: '180px',
         valueFontWeight: '900',
         valueColor: '#ffffff',
-        isValueGradient: false,
-        valueGradientColors: { from: '#ffffff', to: '#cbd5e1', direction: 'to right' },
+        isValueGradient: true,
+        valueGradientColors: {from: '#fef08a', to: '#eab308', direction: 'to bottom'},
         
         // Prefix styling
         prefixFontSize: '110px',
