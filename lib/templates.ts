@@ -198,24 +198,24 @@ export const posterTemplates: Template[] = [
     
     globalTexts: [
       { 
-        id: 'banner', placeholder: 'MTD TOPPERS', top: '16.5%', left: '20%', width: '60%', height: '300px', 
-        fontSize: '200px', fontWeight: '900', color: '#000000',
-        isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px' 
+        id: 'banner', placeholder: 'MTD TOPPERS', top: '14.5%', left: '31%', width: '38%', height: '300px', 
+        fontSize: '140px', fontWeight: '900', color: '#000000',
+        isCurved: false, curvePath: 'M 100,250 Q 1050,250 2000,250', strokeColor: '#000000', strokeWidth: '6px' 
       },
       { 
-        id: 'bottomBanner', placeholder: 'TEAM KATTAKADA', top: '90%', left: '20%', width: '60%', height: '250px', 
+        id: 'bottomBanner', placeholder: 'TEAM KATTAKADA', top: '93.8%', left: '27%', width: '47%', height: '250px', 
         fontSize: '140px', fontWeight: '900', color: '#000000',
-        isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '4px'
+        isCurved: false, curvePath: 'M 100,250 Q 1050,250 2000,250', strokeColor: '#000000', strokeWidth: '4px'
       }
     ],
     
     slots: [
       {
         id: 0,
-        imageBox: { top: '27.5%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        imageBox: { top: '21%', left: '28%', width: '1500px', height: '1400px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 20, opacity: 0.31 },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '34.5%', left: '48%', width: '1600px', height: '250px' },
-          { id: 'detail', placeholder: 'Enter Value', top: '41.5%', left: '48%', width: '1600px', height: '150px' }
+          { id: 'name', placeholder: 'Enter Name', top: '47%', left: '33%', width: '1200px', height: '250px' },
+          { id: 'detail', placeholder: 'Enter Value', top: '52%', left: '33%', width: '1200px', height: '150px' }
         ]
       },
       {
