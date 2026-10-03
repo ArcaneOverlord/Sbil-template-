@@ -212,7 +212,7 @@ export const posterTemplates: Template[] = [
     slots: [
       {
         id: 0,
-        imageBox: { top: '21%', left: '28%', width: '1500px', height: '1400px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 20, opacity: 0.31 },
+        imageBox: { top: '21%', left: '28%', width: '1500px', height: '1400px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [
           { id: 'name', placeholder: 'Enter Name', top: '47%', left: '33%', width: '1200px', height: '250px' },
           { id: 'detail', placeholder: 'Enter Value', top: '52%', left: '33%', width: '1200px', height: '150px' }
@@ -220,18 +220,18 @@ export const posterTemplates: Template[] = [
       },
       {
         id: 1,
-        imageBox: { top: '49%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        imageBox: { top: '56%', left: '13%', width: '1000px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '56%', left: '48%', width: '1600px', height: '250px' },
-          { id: 'detail', placeholder: 'Enter Value', top: '62.5%', left: '48%', width: '1600px', height: '150px' }
+          { id: 'name', placeholder: 'Enter Name', top: '74.5%', left: '13.3%', width: '900px', height: '150px' },
+          { id: 'detail', placeholder: 'Enter Value', top: '77.5%', left: '13.3%', width: '900px', height: '150px' }
         ]
       },
       {
         id: 2,
-        imageBox: { top: '70%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        imageBox: { top: '56%', left: '60.7%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 20, opacity: 0.31 },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '76.3%', left: '48%', width: '1600px', height: '250px' },
-          { id: 'detail', placeholder: 'Enter Value', top: '82.5%', left: '48%', width: '1600px', height: '150px' }
+          { id: 'name', placeholder: 'Enter Name', top: '74.5%', left: '61%', width: '900px', height: '150px' },
+          { id: 'detail', placeholder: 'Enter Value', top: '77.5%', left: '61%', width: '900px', height: '150px' }
         ]
       }
     ]
