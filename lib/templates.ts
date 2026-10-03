@@ -168,44 +168,44 @@ export const posterTemplates: Template[] = [
     
     defaultTextStyles: {
       name: {
-        fontSize: '160px',
+        fontSize: '120px',
         fontWeight: 'bold',
         color: '#ffffff',
-        isGradient: false,
-        gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
+        isGradient: true,
+        gradientColors: { from: '#F0D28E', to: '#C8A263', direction: 'to bottom right' }
       },
       detail: {
         fontSize: '100px',
         fontWeight: 'bold',
         color: '#94a3b8',
-        valueFontSize: '180px',
+        valueFontSize: '110px',
         valueFontWeight: '900',
         valueColor: '#ffffff',
         isValueGradient: true,
-        valueGradientColors: {from: '#fef08a', to: '#eab308', direction: 'to bottom'},
-        prefixFontSize: '110px',
+        valueGradientColors: {from: '#F0D28E', to: '#C8A263 ', direction: 'to bottom'},
+        prefixFontSize: '80px',
         prefixFontWeight: 'bold',
-        prefixColor: '#cbd5e1',
+        prefixColor: '#ffffff',
         isPrefixGradient: false,
         prefixGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
-        unitFontSize: '120px',
+        unitFontSize: '80px',
         unitFontWeight: 'bold',
         unitColor: '#fef08a',
-        isUnitGradient: false,
-        unitGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to right' }
+        isUnitGradient: true,
+        unitGradientColors: { from: '#F0D28E', to: '#C8A263', direction: 'to right' }
       }
     },
     
     globalTexts: [
       { 
         id: 'banner', placeholder: 'MTD TOPPERS', top: '14.5%', left: '31%', width: '38%', height: '300px', 
-        fontSize: '140px', fontWeight: '900', color: '#000000',
-        isCurved: false, curvePath: 'M 100,250 Q 1050,250 2000,250', strokeColor: '#000000', strokeWidth: '6px' 
+        fontSize: '140px', fontWeight: '900', color: '#1e293d',
+        isCurved: false, curvePath: 'M 100,250 Q 1050,250 2000,250', strokeColor: '#1e293d', strokeWidth: '6px' 
       },
       { 
         id: 'bottomBanner', placeholder: 'TEAM KATTAKADA', top: '93.8%', left: '27%', width: '47%', height: '250px', 
-        fontSize: '140px', fontWeight: '900', color: '#000000',
-        isCurved: false, curvePath: 'M 100,250 Q 1050,250 2000,250', strokeColor: '#000000', strokeWidth: '4px'
+        fontSize: '140px', fontWeight: '900', color: '#1e293d',
+        isCurved: false, curvePath: 'M 100,250 Q 1050,250 2000,250', strokeColor: '#1e293d', strokeWidth: '4px'
       }
     ],
     
@@ -214,24 +214,24 @@ export const posterTemplates: Template[] = [
         id: 0,
         imageBox: { top: '21%', left: '28%', width: '1500px', height: '1400px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '47%', left: '33%', width: '1200px', height: '250px' },
-          { id: 'detail', placeholder: 'Enter Value', top: '52%', left: '33%', width: '1200px', height: '150px' }
+          { id: 'name', placeholder: 'Enter Name', top: '47.5%', left: '33%', width: '1200px', height: '220px', fontSize: '160px'},
+          { id: 'detail', placeholder: 'Enter Value', top: '51.1%', left: '33%', width: '1200px', height: '180px', prefixFontSize: '100px', valueFontSize: '140px', unitFontSize: '120' }
         ]
       },
       {
         id: 1,
         imageBox: { top: '56%', left: '13%', width: '1000px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '74.5%', left: '13.3%', width: '900px', height: '150px' },
-          { id: 'detail', placeholder: 'Enter Value', top: '77.5%', left: '13.3%', width: '900px', height: '150px' }
+          { id: 'name', placeholder: 'Enter Name', top: '74.3%', left: '13.7%', width: '900px', height: '180px' },
+          { id: 'detail', placeholder: 'Enter Value', top: '77.4%', left: '13.7%', width: '900px', height: '150px' }
         ]
       },
       {
         id: 2,
-        imageBox: { top: '56%', left: '60.7%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 20, opacity: 0.31 },
+        imageBox: { top: '56%', left: '60.7%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '74.5%', left: '61%', width: '900px', height: '150px' },
-          { id: 'detail', placeholder: 'Enter Value', top: '77.5%', left: '61%', width: '900px', height: '150px' }
+          { id: 'name', placeholder: 'Enter Name', top: '74.3%', left: '61%', width: '900px', height: '180px' },
+          { id: 'detail', placeholder: 'Enter Value', top: '77.4%', left: '61%', width: '900px', height: '150px' }
         ]
       }
     ]
