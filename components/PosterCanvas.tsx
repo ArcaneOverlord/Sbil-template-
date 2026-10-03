@@ -16,7 +16,7 @@ interface PosterProps {
 }
 
 // You can leave this as true. It will now automatically hide itself when exporting.
-const DEBUG_MODE = true; 
+const DEBUG_MODE = false; 
 
 const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, globalBanner, globalBottomBanner, globalMetric, isExporting, achievers }, ref) => {
   
