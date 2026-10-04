@@ -119,7 +119,8 @@ export const posterTemplates: Template[] = [
       { 
         id: 'banner', placeholder: 'MTD TOPPERS', top: '16.5%', left: '20%', width: '60%', height: '300px', 
         fontSize: '200px', fontWeight: '900', color: '#000000',
-        isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px' 
+        isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px', 
+        isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }
       },
       { 
         id: 'bottomBanner', placeholder: 'TEAM KATTAKADA', top: '90%', left: '20%', width: '60%', height: '250px', 
@@ -238,11 +239,11 @@ export const posterTemplates: Template[] = [
   },
   
    // ----------------------------------------------------
-  // TEMPLATE 2: New V3
+  // TEMPLATE 3: New V3
   // ----------------------------------------------------
   {
-    id: 'sbi-life-top-3-v2',
-    name: 'Top 3 Achievers (V2)',
+    id: 'sbi-life-top-3-v3',
+    name: 'Top 3 Achievers (V3)',
     description: 'Alternative MTD/YTD recognition poster for top 3 sales performers.',
     thumbnail: '/v3.png',
     background: '/v3.png',
@@ -279,8 +280,8 @@ export const posterTemplates: Template[] = [
     
     globalTexts: [
       { 
-        id: 'banner', placeholder: 'MTD TOPPERS', top: '14.5%', left: '31%', width: '38%', height: '300px', 
-        fontSize: '140px', fontWeight: '900', color: '#1e293d',
+        id: 'banner', placeholder: 'MTD TOPPERS', top: '14.5%', left: '31%', width: '60%', height: '400px', 
+        fontSize: '220px', fontWeight: '900', color: '#ffffff',
         isCurved: false, curvePath: 'M 100,250 Q 1050,250 2000,250', strokeColor: '#1e293d', strokeWidth: '6px' 
       },
       { 
