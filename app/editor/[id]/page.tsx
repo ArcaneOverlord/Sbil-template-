@@ -36,7 +36,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [globalBanner, setGlobalBanner] = useState('MTD TOPPERS');
   const [globalBottomBanner, setGlobalBottomBanner] = useState('TEAM KATTAKADA');
   const [globalMetric, setGlobalMetric] = useState('Prem');
-  const [globalUnit, setGlobalUnit] = useState('Lakh'); // Changed default to Lakh
+  const [globalUnit, setGlobalUnit] = useState('Lakh');
 
   const [achievers, setAchievers] = useState<AchieverData[]>(
     template.slots.map(() => ({ name: '', metricValue: '', metricUnit: 'Lakh', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
@@ -117,7 +117,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     try {
       setIsExporting(true);
       setIsPanEnabled(false); 
-      // The canvas will now instantly drop the debug borders because isExporting is true
       await new Promise(r => setTimeout(r, 150)); 
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
@@ -216,7 +215,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                   <input
                     type="text" 
                     value={globalBottomBanner} 
-                    onChange={(e) => setGlobalBottomBanner(e.target.value.toUpperCase())} // Forces strictly uppercase text
+                    onChange={(e) => setGlobalBottomBanner(e.target.value.toUpperCase())}
                     placeholder="E.g., KERALA REGION"
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
                   />
@@ -260,7 +259,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                   <input 
                     type="text" value={achiever.name}
                     onFocus={() => handleInputFocus(idx)}
-                    onChange={(e) => handleTextChange(idx, 'name', e.target.value)}
+                    // NEW: Added .toUpperCase() to force capital letters for names
+                    onChange={(e) => handleTextChange(idx, 'name', e.target.value.toUpperCase())}
                     placeholder="Enter Name" 
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
                   />
