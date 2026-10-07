@@ -215,7 +215,7 @@ export const posterTemplates: Template[] = [
         id: 0,
         imageBox: { top: '21%', left: '28%', width: '1500px', height: '1400px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [
-          { id: 'name', placeholder: 'Enter Name', top: '47.5%', left: '33%', width: '1200px', height: '220px', fontSize: '160px'},
+          { id: 'name', placeholder: 'Enter Name', top: '47.5%', left: '33%', width: '1200px', height: '220px', fontSize: '150px'},
           { id: 'detail', placeholder: 'Enter Value', top: '51.1%', left: '33%', width: '1200px', height: '180px', prefixFontSize: '100px', valueFontSize: '140px', unitFontSize: '120' }
         ]
       },
