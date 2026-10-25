@@ -32,21 +32,22 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [isPanning, setIsPanning] = useState(false);
   const lastPanPoint = useRef({ x: 0, y: 0 });
   const [viewportHeight, setViewportHeight] = useState('100vh');
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const [globalBanner, setGlobalBanner] = useState('MTD TOPPERS');
   const [globalBottomBanner, setGlobalBottomBanner] = useState('TEAM KATTAKADA');
   const [globalMetric, setGlobalMetric] = useState('Prem');
   const [globalUnit, setGlobalUnit] = useState('Lakh');
+  
+  // NEW: Banner Month Toggle States
+  const [showMonth, setShowMonth] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState('OCTOBER');
 
-  // NEW: Dynamic Data state based on the template's customFields
   const [customData, setCustomData] = useState<Record<string, any>>(() => {
     const initData: Record<string, any> = {};
     template.customFields?.forEach(field => {
-      if (field.type === 'text') {
-        initData[field.id] = field.defaultValue || '';
-      } else if (field.type === 'image') {
-        initData[field.id] = { url: field.defaultValue || null, scale: 1, x: 0, y: 0 };
-      }
+      if (field.type === 'text') initData[field.id] = field.defaultValue || '';
+      else if (field.type === 'image') initData[field.id] = { url: field.defaultValue || null, scale: 1, x: 0, y: 0 };
     });
     return initData;
   });
@@ -56,9 +57,13 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   );
 
   useEffect(() => {
-    const updateHeight = () => setViewportHeight(`${window.innerHeight}px`);
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
+    const handleResize = () => {
+      setViewportHeight(`${window.innerHeight}px`);
+      setIsDesktop(window.innerWidth >= 1024); 
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    
     window.history.pushState(null, '', window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, '', window.location.href);
@@ -67,15 +72,16 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     window.addEventListener('popstate', handlePopState);
     const handleBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
     window.addEventListener('beforeunload', handleBeforeUnload);
+    
     return () => {
-      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('resize', handleResize);
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [router]);
 
   const handleDrawerMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDraggingDrawer) return;
+    if (!isDraggingDrawer || isDesktop) return;
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
     const windowHeight = window.innerHeight;
     const newHeight = ((windowHeight - clientY) / windowHeight) * 100;
@@ -91,7 +97,10 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
   const endPan = () => setIsPanning(false);
 
-  const handleInputFocus = (idx: number | null) => { setActiveSlot(idx); setDrawerHeight(65); };
+  const handleInputFocus = (idx: number | null) => { 
+    setActiveSlot(idx); 
+    if (!isDesktop) setDrawerHeight(65); 
+  };
 
   const handleTextChange = (index: number, field: string, value: string) => {
     const newAchievers = [...achievers];
@@ -114,7 +123,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         newAchievers[index].imgConfig = { scale: 1, x: 0, y: 0 }; 
         setAchievers(newAchievers);
         setActiveSlot(index); 
-        setDrawerHeight(65);
+        if (!isDesktop) setDrawerHeight(65);
       };
       reader.readAsDataURL(e.target.files[0]);
     }
@@ -139,14 +148,17 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     } catch (err) { alert('Export failed.'); } finally { setIsExporting(false); }
   };
 
+  // NEW: Dynamically constructs the banner string if the month toggle is on
+  const computedBanner = showMonth ? `${selectedMonth} ${globalBanner}` : globalBanner;
+
   return (
     <main 
-      className="fixed top-0 left-0 w-full bg-slate-950 text-slate-200 flex flex-col overflow-hidden overscroll-none touch-none"
+      className="fixed top-0 left-0 w-full bg-slate-950 text-slate-200 flex flex-col lg:flex-row overflow-hidden overscroll-none touch-none"
       style={{ height: viewportHeight }}
       onMouseMove={handleDrawerMove} onTouchMove={handleDrawerMove}
       onMouseUp={() => setIsDraggingDrawer(false)} onTouchEnd={() => setIsDraggingDrawer(false)}
     >
-      <div className="absolute top-0 left-0 w-full pt-6 pb-4 px-4 flex justify-between items-center z-50 pointer-events-none bg-gradient-to-b from-slate-950/80 to-transparent">
+      <div className="absolute top-0 left-0 w-full lg:w-2/3 pt-6 pb-4 px-4 flex justify-between items-center z-50 pointer-events-none bg-gradient-to-b from-slate-950/80 to-transparent">
         <button onClick={() => { if(confirm("Discard progress?")) router.push('/gallery'); }} className="pointer-events-auto flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-700 shadow-lg text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800">
           <ArrowLeft size={18} /> Exit
         </button>
@@ -156,8 +168,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
       </div>
 
       <div 
-        className={`w-full absolute top-0 left-0 flex justify-center items-center overflow-hidden pt-[80px] pb-4 ${isPanEnabled ? 'touch-none' : ''}`}
-        style={{ height: `${100 - drawerHeight}%` }}
+        className={`w-full lg:w-2/3 absolute lg:relative top-0 left-0 flex justify-center items-center overflow-hidden pt-[80px] lg:pt-0 pb-4 ${isPanEnabled ? 'touch-none' : ''}`}
+        style={{ height: isDesktop ? '100%' : `${100 - drawerHeight}%` }}
         onPointerDown={startPan} onPointerMove={doPan} onPointerUp={endPan} onPointerLeave={endPan}
       >
         <div className="absolute right-4 bottom-2 mb-2 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur-sm shadow-lg">
@@ -185,27 +197,27 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             ref={posterRef} 
             template={template} 
             achievers={achievers} 
-            globalBanner={globalBanner} 
+            globalBanner={computedBanner} // Passed the new computed string here
             globalBottomBanner={globalBottomBanner}
             globalMetric={globalMetric} 
             isExporting={isExporting} 
-            customData={customData} // NEW
+            customData={customData} 
           />
         </div>
       </div>
 
       <div 
-        className="absolute bottom-0 left-0 w-full bg-slate-900 border-t border-slate-700 rounded-t-3xl shadow-[0_-20px_40px_rgba(0,0,0,0.5)] flex flex-col z-40 transition-all duration-300"
-        style={{ height: `${drawerHeight}%` }}
+        className="absolute lg:relative bottom-0 left-0 w-full lg:w-1/3 bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-700 rounded-t-3xl lg:rounded-none shadow-[0_-20px_40px_rgba(0,0,0,0.5)] lg:shadow-[-20px_0_40px_rgba(0,0,0,0.3)] flex flex-col z-40 transition-all duration-300"
+        style={{ height: isDesktop ? '100%' : `${drawerHeight}%` }}
       >
         <div 
-          className="w-full flex justify-center p-4 cursor-ns-resize touch-none"
+          className="w-full flex justify-center p-4 cursor-ns-resize touch-none lg:hidden"
           onMouseDown={() => setIsDraggingDrawer(true)} onTouchStart={() => setIsDraggingDrawer(true)}
         >
           <div className="w-16 h-1.5 bg-slate-600 rounded-full hover:bg-slate-500 transition-colors"></div>
         </div>
 
-        <div className="px-6 pb-6 overflow-y-auto flex-1 overscroll-contain">
+        <div className="px-6 pb-6 lg:pt-8 overflow-y-auto flex-1 overscroll-contain">
           
           <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 mb-6">
             <div className="flex items-center gap-2 mb-4">
@@ -214,16 +226,48 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             </div>
             <div className="space-y-4">
               <div className="flex gap-4">
+                
                 <div className="w-1/2">
                   <label className="text-xs text-slate-500 mb-1.5 block font-medium">Top Banner</label>
-                  <select
-                    value={globalBanner} onChange={(e) => setGlobalBanner(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
-                  >
-                    <option value="MTD TOPPERS">MTD TOPPERS</option>
-                    <option value="YTD TOPPERS">YTD TOPPERS</option>
-                  </select>
+                  <div className="flex bg-slate-900 border border-slate-700 rounded-lg p-1 mb-2">
+                    <button 
+                      className={`flex-1 py-1 text-sm font-semibold rounded-md transition-colors ${globalBanner === 'MTD TOPPERS' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                      onClick={() => setGlobalBanner('MTD TOPPERS')}
+                    >
+                      MTD
+                    </button>
+                    <button 
+                      className={`flex-1 py-1 text-sm font-semibold rounded-md transition-colors ${globalBanner === 'YTD TOPPERS' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                      onClick={() => setGlobalBanner('YTD TOPPERS')}
+                    >
+                      YTD
+                    </button>
+                  </div>
+                  {/* NEW: Month Toggle UI */}
+                  <div className="flex flex-col gap-2 mt-2">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400">
+                      <input 
+                        type="checkbox" 
+                        checked={showMonth} 
+                        onChange={(e) => setShowMonth(e.target.checked)} 
+                        className="rounded border-slate-700 bg-slate-900 text-blue-600 accent-blue-600" 
+                      />
+                      Add Month Prefix
+                    </label>
+                    {showMonth && (
+                      <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-blue-500 text-white"
+                      >
+                        {['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'].map(m => (
+                          <option key={m} value={m}>{m}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
                 </div>
+
                 <div className="w-1/2">
                   <label className="text-xs text-slate-500 mb-1.5 block font-medium">Bottom Banner</label>
                   <input
@@ -231,11 +275,12 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     value={globalBottomBanner} 
                     onChange={(e) => setGlobalBottomBanner(e.target.value.toUpperCase())}
                     placeholder="E.g., KERALA REGION"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 text-white"
                   />
                 </div>
               </div>
-              <div>
+              
+              <div className="pt-2">
                 <label className="text-xs text-slate-500 mb-1.5 block font-medium">Default Master Values</label>
                 <div className="flex gap-2">
                   <select
@@ -264,7 +309,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             </div>
           </div>
 
-          {/* NEW: DYNAMIC TEMPLATE EXTRAS PANEL */}
           {template.customFields && template.customFields.length > 0 && (
             <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 mb-6">
               <div className="flex items-center gap-2 mb-4">
@@ -293,7 +337,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                               reader.onload = (event) => {
                                 setCustomData(prev => ({ ...prev, [field.id]: { url: event.target?.result as string, scale: 1, x: 0, y: 0 } }));
                                 setActiveSlot(null);
-                                setDrawerHeight(65);
+                                if (!isDesktop) setDrawerHeight(65);
                               };
                               reader.readAsDataURL(e.target.files[0]);
                             }
