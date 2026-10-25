@@ -6,37 +6,31 @@ export interface TextConfig {
   width: string;
   height: string;
   
-  // Base styling (Now optional so they can fall back to defaults)
   fontSize?: string;
   fontWeight?: string;
   color?: string;
   transform?: string;  
   
-  // Curve & Super-Bold settings
   isCurved?: boolean;
   curvePath?: string; 
   strokeColor?: string;
   strokeWidth?: string;
 
-  // Main Text Gradient Settings
   isGradient?: boolean;
   gradientColors?: { from: string; to: string; direction?: string };
   
-  // NEW: Entered Value Emphasis & Gradient Settings
   valueFontSize?: string;
   valueFontWeight?: string;
   valueColor?: string;
   isValueGradient?: boolean; 
   valueGradientColors?: { from: string; to: string; direction?: string };
 
-  // Prefix (e.g., "Prem:") Settings
   prefixFontSize?: string;
   prefixFontWeight?: string;
   prefixColor?: string;
   isPrefixGradient?: boolean;
   prefixGradientColors?: { from: string; to: string; direction?: string };
 
-  // Unit (e.g., "Cr") Settings
   unitFontSize?: string;
   unitFontWeight?: string;
   unitColor?: string;
@@ -57,6 +51,16 @@ export interface ImageConfig {
   opacity: number; 
 }
 
+// REQUIRED FOR DYNAMIC TEMPLATE EXTRAS TO WORK
+export interface CustomField {
+  id: string;
+  type: 'text' | 'image';
+  label: string; 
+  defaultValue?: string; 
+  textConfig?: TextConfig;
+  imageConfig?: ImageConfig;
+}
+
 export interface SlotConfig {
   id: number;
   imageBox: ImageConfig;
@@ -70,7 +74,8 @@ export interface Template {
   thumbnail: string;
   background: string;
   globalTexts?: TextConfig[]; 
-  defaultTextStyles?: Record<string, Partial<TextConfig>>; // NEW: Template-specific master theme
+  defaultTextStyles?: Record<string, Partial<TextConfig>>; 
+  customFields?: CustomField[]; // REQUIRED FOR DYNAMIC EXTRAS
   slots: SlotConfig[];
 }
 
@@ -248,6 +253,9 @@ export const posterTemplates: Template[] = [
     thumbnail: '/v3.png',
     background: '/v3.png',
     
+    // Add custom fields here if you want extra elements like sponsor logos or event dates!
+    customFields: [], 
+
     defaultTextStyles: {
       name: {
         fontSize: '120px',

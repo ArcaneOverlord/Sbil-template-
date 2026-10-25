@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, use } from 'react';
 import { toPng } from 'html-to-image';
 import PosterCanvas from '@/components/PosterCanvas';
-import { Download, ImagePlus, ArrowLeft, Maximize, Move, ZoomIn, ZoomOut, Lock, Unlock, Settings } from 'lucide-react';
+import { Download, ImagePlus, ArrowLeft, Maximize, Move, ZoomIn, ZoomOut, Lock, Unlock, Settings, Layers } from 'lucide-react';
 import { posterTemplates } from '@/lib/templates';
 import { notFound, useRouter } from 'next/navigation';
 
@@ -37,6 +37,19 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [globalBottomBanner, setGlobalBottomBanner] = useState('TEAM KATTAKADA');
   const [globalMetric, setGlobalMetric] = useState('Prem');
   const [globalUnit, setGlobalUnit] = useState('Lakh');
+
+  // NEW: Dynamic Data state based on the template's customFields
+  const [customData, setCustomData] = useState<Record<string, any>>(() => {
+    const initData: Record<string, any> = {};
+    template.customFields?.forEach(field => {
+      if (field.type === 'text') {
+        initData[field.id] = field.defaultValue || '';
+      } else if (field.type === 'image') {
+        initData[field.id] = { url: field.defaultValue || null, scale: 1, x: 0, y: 0 };
+      }
+    });
+    return initData;
+  });
 
   const [achievers, setAchievers] = useState<AchieverData[]>(
     template.slots.map(() => ({ name: '', metricValue: '', metricUnit: 'Lakh', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
@@ -78,7 +91,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   };
   const endPan = () => setIsPanning(false);
 
-  const handleInputFocus = (idx: number) => { setActiveSlot(idx); setDrawerHeight(65); };
+  const handleInputFocus = (idx: number | null) => { setActiveSlot(idx); setDrawerHeight(65); };
 
   const handleTextChange = (index: number, field: string, value: string) => {
     const newAchievers = [...achievers];
@@ -176,6 +189,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             globalBottomBanner={globalBottomBanner}
             globalMetric={globalMetric} 
             isExporting={isExporting} 
+            customData={customData} // NEW
           />
         </div>
       </div>
@@ -250,21 +264,73 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             </div>
           </div>
 
+          {/* NEW: DYNAMIC TEMPLATE EXTRAS PANEL */}
+          {template.customFields && template.customFields.length > 0 && (
+            <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Layers size={16} className="text-slate-400" />
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Template Extras</h3>
+              </div>
+              <div className="space-y-4">
+                {template.customFields.map(field => (
+                  <div key={field.id}>
+                    <label className="text-xs text-slate-500 mb-1.5 block font-medium">{field.label}</label>
+                    {field.type === 'text' ? (
+                      <input
+                        type="text"
+                        value={customData[field.id] || ''}
+                        onFocus={() => handleInputFocus(null)}
+                        onChange={(e) => setCustomData(prev => ({...prev, [field.id]: e.target.value}))}
+                        placeholder={`Enter ${field.label}`}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white"
+                      />
+                    ) : (
+                      <div className="space-y-2">
+                        <label className="flex items-center justify-center w-full h-12 border border-dashed border-slate-600 rounded-lg hover:border-blue-500 hover:bg-slate-800/50 cursor-pointer transition-colors">
+                          <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                setCustomData(prev => ({ ...prev, [field.id]: { url: event.target?.result as string, scale: 1, x: 0, y: 0 } }));
+                                setActiveSlot(null);
+                                setDrawerHeight(65);
+                              };
+                              reader.readAsDataURL(e.target.files[0]);
+                            }
+                          }} />
+                          <div className="flex items-center gap-2 text-slate-400 text-sm">
+                            <ImagePlus size={16} />{customData[field.id]?.url ? 'Change Image' : 'Upload Image'}
+                          </div>
+                        </label>
+                        {customData[field.id]?.url && (
+                          <div className="pt-2 flex gap-3 items-center">
+                             <Maximize size={14} className="text-slate-500 shrink-0" />
+                             <input type="range" min="0.5" max="3" step="0.1" value={customData[field.id].scale} onChange={(e) => setCustomData(prev => ({...prev, [field.id]: { ...prev[field.id], scale: parseFloat(e.target.value) }}))} className="w-1/3 accent-blue-500" />
+                             <Move size={14} className="text-slate-500 shrink-0 ml-2" />
+                             <input type="range" min="-500" max="500" step="10" value={customData[field.id].x} onChange={(e) => setCustomData(prev => ({...prev, [field.id]: { ...prev[field.id], x: parseInt(e.target.value) }}))} className="w-1/4 accent-slate-400" />
+                             <input type="range" min="-500" max="500" step="10" value={customData[field.id].y} onChange={(e) => setCustomData(prev => ({...prev, [field.id]: { ...prev[field.id], y: parseInt(e.target.value) }}))} className="w-1/4 accent-slate-400" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
             {achievers.map((achiever, idx) => (
               <div key={idx} className={`p-4 rounded-xl border transition-all duration-300 ${activeSlot === idx ? 'bg-slate-800 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-slate-950 border-slate-800'}`}>
                 <h3 className="font-semibold text-amber-400 mb-3 text-sm">Achiever No.{idx + 1}</h3>
                 <div className="space-y-3">
-                  
                   <input 
                     type="text" value={achiever.name}
                     onFocus={() => handleInputFocus(idx)}
-                    // NEW: Added .toUpperCase() to force capital letters for names
                     onChange={(e) => handleTextChange(idx, 'name', e.target.value.toUpperCase())}
                     placeholder="Enter Name" 
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
                   />
-                  
                   <div className="flex gap-2">
                     <div className="w-1/3 bg-slate-900/80 border border-slate-800 rounded-lg px-2 py-2 text-sm text-slate-500 flex items-center justify-center font-medium">
                       {globalMetric}
