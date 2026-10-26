@@ -115,7 +115,7 @@ export const posterTemplates: Template[] = [
         // NEW: Box Gradient applied to the Team background
         boxStyle: { 
           isGradient: true, 
-          gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }, 
+          gradientColors: { from: '#edd606', to: '#eab308', direction: 'to right bottom' }, 
           borderRadius: '60px' 
         } 
       }
