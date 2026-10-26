@@ -103,14 +103,14 @@ export const posterTemplates: Template[] = [
         fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
         valueFontSize: '180px', valueFontWeight: '900', valueColor: '#ffffff', isValueGradient: true, valueGradientColors: {from: '#fef08a', to: '#eab308', direction: 'to bottom'},
         prefixFontSize: '110px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1', isPrefixGradient: false, prefixGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
-        unitFontSize: '120px', unitFontWeight: 'bold', unitColor: '#fef08a', isUnitGradient: false, unitGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to right' }
+        unitFontSize: '120px', unitFontWeight: 'bold', unitColor: '#eab308', isUnitGradient: true, unitGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to right' }
       },
       team: { 
         placeholder: 'Enter Team',
         fontSize: '80px', fontWeight: 'bold', color: '#060707',
         // NEW: Creates the rounded edge rectangle block behind the team text in V1
         boxStyle: { backgroundColor: '#eab308', borderRadius: '60px' } 
-      }
+      }//#FFD330//
     },
     globalTexts: [
       { id: 'banner', placeholder: 'MTD TOPPERS', top: '16%', left: '20%', width: '60%', height: '300px', fontSize: '155px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px', isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } },
@@ -137,7 +137,7 @@ export const posterTemplates: Template[] = [
         textBoxes: [ 
           { id: 'name', top: '76.3%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '73%', fontSize: '140px' } }, 
           { id: 'detail', top: '82.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '81.7%' } }, 
-          { id: 'team', top: '85n%', left: '51%', width: '1400px', height: '90px' } ]
+          { id: 'team', top: '85%', left: '51%', width: '1400px', height: '90px' } ]
       }
     ]
   },
