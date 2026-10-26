@@ -11,7 +11,7 @@ interface AchieverData {
   name: string;
   metricValue: string;
   metricUnit: string;
-  team?: string; // NEW
+  team?: string;
   image: string | null;
   imgConfig: { scale: number; x: number; y: number };
 }
@@ -25,10 +25,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const posterRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
-  
-  // Accidental Scroll Protection State
   const [editingImageIdx, setEditingImageIdx] = useState<number | null>(null);
-  
   const [drawerHeight, setDrawerHeight] = useState(15); 
   const [isDraggingDrawer, setIsDraggingDrawer] = useState(false);
   const [isPanEnabled, setIsPanEnabled] = useState(false);
@@ -39,7 +36,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [viewportHeight, setViewportHeight] = useState('100vh');
   const [isDesktop, setIsDesktop] = useState(false);
 
-  // Global Settings States
   const [bannerType, setBannerType] = useState<'MTD' | 'YTD'>('MTD');
   const [showMonth, setShowMonth] = useState(false); 
   const [selectedMonth, setSelectedMonth] = useState('OCTOBER');
@@ -47,7 +43,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [globalBottomBanner, setGlobalBottomBanner] = useState('TEAM KATTAKADA');
   const [globalMetric, setGlobalMetric] = useState('Prem');
   const [globalUnit, setGlobalUnit] = useState('Lakh');
-  const [showTeamInput, setShowTeamInput] = useState(false); // NEW
+  const [showTeamInput, setShowTeamInput] = useState(false); 
 
   const [customData, setCustomData] = useState<Record<string, any>>(() => {
     const initData: Record<string, any> = {};
@@ -127,7 +123,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         newAchievers[index].imgConfig = { scale: 1, x: 0, y: 0 }; 
         setAchievers(newAchievers);
         setActiveSlot(index); 
-        // Auto-open the image adjust panel once uploaded
         setEditingImageIdx(index);
         if (!isDesktop) setDrawerHeight(65);
       };
@@ -145,7 +140,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     try {
       setIsExporting(true);
       setIsPanEnabled(false); 
-      setEditingImageIdx(null); // Close active image adjustments before export
+      setEditingImageIdx(null); 
       await new Promise(r => setTimeout(r, 150)); 
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
@@ -178,12 +173,14 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         </button>
       </div>
 
+      {/* NEW: Added select-none and onContextMenu override to entirely block text copying from the preview canvas */}
       <div 
-        className={`w-full lg:w-2/3 absolute lg:relative top-0 left-0 flex justify-center items-center overflow-hidden pt-[80px] lg:pt-0 pb-4 ${isPanEnabled ? 'touch-none' : ''}`}
+        className={`w-full lg:w-2/3 absolute lg:relative top-0 left-0 flex justify-center items-center overflow-hidden pt-[80px] lg:pt-0 pb-4 select-none ${isPanEnabled ? 'touch-none' : ''}`}
         style={{ height: isDesktop ? '100%' : `${100 - drawerHeight}%` }}
         onPointerDown={startPan} onPointerMove={doPan} onPointerUp={endPan} onPointerLeave={endPan}
+        onContextMenu={(e) => e.preventDefault()}
       >
-        <div className="absolute right-4 bottom-2 mb-2 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur-sm shadow-lg">
+        <div className="absolute right-4 bottom-2 mb-2 flex flex-col gap-2 z-10 bg-slate-900/80 p-2 rounded-xl border border-slate-700 backdrop-blur-sm shadow-lg pointer-events-auto">
            <button 
               onClick={() => setIsPanEnabled(!isPanEnabled)} 
               className={`flex flex-col items-center justify-center p-2 rounded-lg text-[10px] font-bold transition-all ${isPanEnabled ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
@@ -201,7 +198,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         </div>
 
         <div 
-          className={`transition-transform w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing' : 'duration-300 pointer-events-none'}`}
+          className={`transition-transform w-full h-full flex items-center justify-center ${isPanEnabled ? 'duration-0 cursor-grab active:cursor-grabbing pointer-events-auto' : 'duration-300 pointer-events-none'}`}
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${workspaceZoom})` }}
         >
           <PosterCanvas 
@@ -212,7 +209,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             globalBottomBanner={globalBottomBanner}
             globalMetric={globalMetric} 
             isExporting={isExporting} 
-            showTeamInput={showTeamInput} // NEW
+            showTeamInput={showTeamInput} 
             customData={customData} 
           />
         </div>
@@ -296,8 +293,10 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
 
                 <div className="w-1/2">
                   <label className="text-xs text-slate-500 mb-1.5 block font-medium">Bottom Banner</label>
+                  {/* NEW: Limit bottom banner to 20 characters */}
                   <input
                     type="text" 
+                    maxLength={20}
                     value={globalBottomBanner} 
                     onChange={(e) => setGlobalBottomBanner(e.target.value.toUpperCase())}
                     placeholder="E.g., KERALA REGION"
@@ -333,7 +332,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                 </div>
               </div>
 
-              {/* NEW: TEAM TEXT TOGGLE */}
               <div className="pt-3 border-t border-slate-800 mt-2">
                 <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400 font-medium">
                   <input 
@@ -362,6 +360,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     {field.type === 'text' ? (
                       <input
                         type="text"
+                        maxLength={30} // NEW
                         value={customData[field.id] || ''}
                         onFocus={() => handleInputFocus(null)}
                         onChange={(e) => setCustomData(prev => ({...prev, [field.id]: e.target.value}))}
@@ -409,17 +408,20 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                 <h3 className="font-semibold text-amber-400 mb-3 text-sm">Achiever No.{idx + 1}</h3>
                 <div className="space-y-3">
                   <input 
-                    type="text" value={achiever.name}
+                    type="text" 
+                    maxLength={30} // NEW
+                    value={achiever.name}
                     onFocus={() => handleInputFocus(idx)}
                     onChange={(e) => handleTextChange(idx, 'name', e.target.value.toUpperCase())}
                     placeholder="Enter Name" 
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
                   />
-
-                  {/* NEW: TEAM INPUT FIELD (Toggled Globally) */}
+                  
                   {showTeamInput && (
                     <input 
-                      type="text" value={achiever.team || ''}
+                      type="text" 
+                      maxLength={30} // NEW
+                      value={achiever.team || ''}
                       onFocus={() => handleInputFocus(idx)}
                       onChange={(e) => handleTextChange(idx, 'team', e.target.value.toUpperCase())}
                       placeholder="Enter Team Name (E.g. TVM BRANCH)" 
@@ -431,8 +433,11 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     <div className="w-1/3 bg-slate-900/80 border border-slate-800 rounded-lg px-2 py-2 text-sm text-slate-500 flex items-center justify-center font-medium">
                       {globalMetric}
                     </div>
+                    {/* NEW: Changed type from number to text to strictly enforce maxLength across browsers */}
                     <input 
-                      type="number" value={achiever.metricValue}
+                      type="text" 
+                      maxLength={30} // NEW
+                      value={achiever.metricValue}
                       onFocus={() => handleInputFocus(idx)}
                       onChange={(e) => handleTextChange(idx, 'metricValue', e.target.value)}
                       placeholder="Value" 
@@ -450,7 +455,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     </select>
                   </div>
 
-                  {/* NEW: COLLAPSIBLE SAFE IMAGE ADJUSTMENTS */}
                   <div className="flex gap-2 mt-2">
                     <label className="flex-1 flex items-center justify-center h-11 border border-dashed border-slate-600 rounded-lg hover:border-blue-500 hover:bg-slate-800/50 cursor-pointer transition-colors">
                       <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(idx, e)} />
@@ -469,7 +473,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     )}
                   </div>
                   
-                  {/* SLIDERS HIDDEN BEHIND TOGGLE BUTTON */}
                   {achiever.image && editingImageIdx === idx && (
                     <div className="p-4 bg-slate-900/80 border border-slate-700 rounded-xl mt-2 space-y-4 animate-in fade-in zoom-in-95 duration-200 shadow-inner">
                       <div className="flex items-center gap-3">
@@ -491,7 +494,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                       </button>
                     </div>
                   )}
-                  {/* --------------------------------------- */}
 
                 </div>
               </div>
