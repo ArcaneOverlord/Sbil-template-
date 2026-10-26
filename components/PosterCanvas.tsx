@@ -115,12 +115,17 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                 {slot.textBoxes.map((baseTb) => {
                   if (baseTb.id === 'team' && !showTeamInput) return null;
                   
-                  // THEME & CONDITIONAL OVERRIDE MERGE
-                  // 1. Get base template theme
-                  // 2. Add specific slot coordinates
-                  // 3. If showTeamInput is ON and this text box has an activeTeamOverride, apply the override coordinates!
-                  const overrideParams = (showTeamInput && baseTb.activeTeamOverride) ? baseTb.activeTeamOverride : {};
-                  const tb = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb, ...overrideParams };
+                  // ABSOLUTE OVERRIDE DEEP MERGE: 
+                  // If team is active, we safely merge nested objects like boxStyle and gradients
+                  const baseMerged = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
+                  const overrideParams = (showTeamInput && baseMerged.activeTeamOverride) ? baseMerged.activeTeamOverride : {};
+                  
+                  const tb = { 
+                    ...baseMerged, 
+                    ...overrideParams,
+                    boxStyle: overrideParams.boxStyle ? { ...baseMerged.boxStyle, ...overrideParams.boxStyle } : baseMerged.boxStyle,
+                    gradientColors: overrideParams.gradientColors ? { ...baseMerged.gradientColors, ...overrideParams.gradientColors } : baseMerged.gradientColors
+                  };
                   
                   const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
                   const prefixGradientStyle = tb.isPrefixGradient && tb.prefixGradientColors ? { backgroundImage: `linear-gradient(${tb.prefixGradientColors.direction || 'to right'}, ${tb.prefixGradientColors.from}, ${tb.prefixGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
@@ -134,7 +139,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                         fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none', zIndex: 20, 
                         WebkitTextStroke: tb.strokeWidth && tb.strokeColor ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, 
                         border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', 
-                        // Automatically applies the boxStyle background shape (like a pill or rectangle)
                         backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : (tb.boxStyle?.backgroundColor || 'transparent'),
                         borderRadius: tb.boxStyle?.borderRadius,
                         padding: tb.boxStyle?.padding
