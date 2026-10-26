@@ -1,5 +1,5 @@
 "use client";
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef, useState, useEffect } from 'react';
 import { Template } from '@/lib/templates';
 
 interface PosterProps {
@@ -8,7 +8,7 @@ interface PosterProps {
   globalBottomBanner: string;
   globalMetric: string;
   isExporting: boolean;
-  showTeamInput: boolean; // NEW: Receives the master settings toggle
+  showTeamInput: boolean;
   achievers: {
     [key: string]: any; 
     image: string | null;
@@ -18,6 +18,46 @@ interface PosterProps {
 }
 
 const DEBUG_MODE = false; 
+
+// NEW: Auto-Scaling Text Engine
+// Measures text width and smoothly squishes it if it overflows the bounding box.
+const FitText = ({ children, gradientStyle }: { children: React.ReactNode, gradientStyle: React.CSSProperties }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current || !textRef.current) return;
+    
+    // Temporarily reset scale to measure the true natural width of the text
+    textRef.current.style.transform = 'scale(1)';
+    
+    const containerWidth = containerRef.current.clientWidth;
+    const textWidth = textRef.current.scrollWidth;
+
+    if (textWidth > containerWidth && containerWidth > 0) {
+      // If it overflows, calculate the exact ratio needed to squeeze it in (with a 2% safety margin)
+      const squeezeRatio = (containerWidth / textWidth) * 0.98;
+      textRef.current.style.transform = `scale(${squeezeRatio})`;
+    }
+  }, [children]);
+
+  return (
+    <div ref={containerRef} style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+      <span 
+        ref={textRef} 
+        style={{ 
+          lineHeight: '1.1', 
+          whiteSpace: 'nowrap', // Forces text onto one line so it squeezes instead of wrapping
+          display: 'inline-block',
+          transformOrigin: 'center',
+          ...gradientStyle 
+        }}
+      >
+        {children}
+      </span>
+    </div>
+  );
+};
 
 const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, globalBanner, globalBottomBanner, globalMetric, isExporting, showTeamInput, achievers, customData }, ref) => {
   
@@ -46,7 +86,7 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                     border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : 'transparent', transform: tb.transform || 'none'
                   }}
                 >
-                  <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>{textValue}</span>
+                  <FitText gradientStyle={gradientStyle}>{textValue}</FitText>
                 </div>
               );
             } 
@@ -82,7 +122,9 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                       <textPath href={`#curve-${tb.id}`} startOffset="50%" textAnchor="middle">{textValue}</textPath>
                     </text>
                   </svg>
-                ) : ( <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word' }}>{textValue}</span> )}
+                ) : ( 
+                  <FitText gradientStyle={{}}>{textValue}</FitText>
+                )}
               </div>
             );
           })}
@@ -100,7 +142,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
 
                 {slot.textBoxes.map((baseTb) => {
                   
-                  // NEW: Hide the Team text box entirely if the Global Settings toggle is turned off
                   if (baseTb.id === 'team' && !showTeamInput) return null;
 
                   const tb = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
@@ -111,15 +152,21 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
 
                   return (
                     <div key={tb.id} className="absolute flex flex-col items-center justify-center text-center" style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none', zIndex: 20, WebkitTextStroke: tb.strokeWidth && tb.strokeColor ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : 'transparent' }}>
-                      {tb.id === 'detail' ? (
-                        <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>
-                          <span style={{ fontSize: tb.prefixFontSize || tb.fontSize, fontWeight: tb.prefixFontWeight || tb.fontWeight, color: tb.prefixColor || tb.color, WebkitTextFillColor: tb.isPrefixGradient ? 'transparent' : (tb.prefixColor || tb.color || 'unset'), ...prefixGradientStyle }}>{globalMetric}: </span>
-                          <span style={{ fontSize: tb.valueFontSize || tb.fontSize, fontWeight: tb.valueFontWeight || tb.fontWeight, color: tb.valueColor || tb.color, WebkitTextFillColor: tb.isValueGradient ? 'transparent' : (tb.valueColor || tb.color || 'unset'), ...valueGradientStyle }}>{` ${achiever.metricValue || '00.00'} `}</span>
-                          <span style={{ fontSize: tb.unitFontSize || tb.fontSize, fontWeight: tb.unitFontWeight || tb.fontWeight, color: tb.unitColor || tb.color, WebkitTextFillColor: tb.isUnitGradient ? 'transparent' : (tb.unitColor || tb.color || 'unset'), ...unitGradientStyle }}>{achiever.metricUnit}</span>
-                        </span>
-                      ) : (
-                        <span style={{ lineHeight: '1.1', width: '100%', wordWrap: 'break-word', ...gradientStyle }}>{achiever[tb.id] || tb.placeholder}</span>
-                      )}
+                      
+                      <FitText gradientStyle={gradientStyle}>
+                        {tb.id === 'detail' ? (
+                          <React.Fragment>
+                            <span style={{ fontSize: tb.prefixFontSize || tb.fontSize, fontWeight: tb.prefixFontWeight || tb.fontWeight, color: tb.prefixColor || tb.color, WebkitTextFillColor: tb.isPrefixGradient ? 'transparent' : (tb.prefixColor || tb.color || 'unset'), ...prefixGradientStyle }}>{globalMetric}: </span>
+                            <span style={{ fontSize: tb.valueFontSize || tb.fontSize, fontWeight: tb.valueFontWeight || tb.fontWeight, color: tb.valueColor || tb.color, WebkitTextFillColor: tb.isValueGradient ? 'transparent' : (tb.valueColor || tb.color || 'unset'), ...valueGradientStyle }}>{` ${achiever.metricValue || '00.00'} `}</span>
+                            <span style={{ fontSize: tb.unitFontSize || tb.fontSize, fontWeight: tb.unitFontWeight || tb.fontWeight, color: tb.unitColor || tb.color, WebkitTextFillColor: tb.isUnitGradient ? 'transparent' : (tb.unitColor || tb.color || 'unset'), ...unitGradientStyle }}>{achiever.metricUnit}</span>
+                          </React.Fragment>
+                        ) : (
+                          <React.Fragment>
+                            {achiever[tb.id] || tb.placeholder}
+                          </React.Fragment>
+                        )}
+                      </FitText>
+
                     </div>
                   );
                 })}
