@@ -1,3 +1,4 @@
+// filepath: lib/templates.ts
 export interface TeamOverrideConfig extends Partial<Omit<TextConfig, 'id' | 'activeTeamOverride'>> {
   active?: boolean; 
 }
@@ -12,6 +13,9 @@ export interface TextConfig {
   activeTeamOverride?: TeamOverrideConfig;
   boxStyle?: {
     backgroundColor?: string; 
+    // NEW: Gradient properties explicitly for the Box/Background Shape
+    isGradient?: boolean;
+    gradientColors?: { from: string; to: string; direction?: string };
     borderRadius?: string;    
     border?: string;          
     padding?: string;         
@@ -95,7 +99,7 @@ export const posterTemplates: Template[] = [
     background: '/v1.png',
     defaultTextStyles: {
       name: { 
-        placeholder: 'Enter Name', // FIX: Ensures placeholder renders on canvas
+        placeholder: 'Enter Name', 
         fontSize: '160px', fontWeight: 'bold', color: '#ffffff', isGradient: false, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } 
       },
       detail: {
@@ -108,9 +112,13 @@ export const posterTemplates: Template[] = [
       team: { 
         placeholder: 'Enter Team',
         fontSize: '80px', fontWeight: 'bold', color: '#060707',
-        // NEW: Creates the rounded edge rectangle block behind the team text in V1
-        boxStyle: { backgroundColor: '#eab308', borderRadius: '60px' } 
-      }//#FFD330//
+        // NEW: Box Gradient applied to the Team background
+        boxStyle: { 
+          isGradient: true, 
+          gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' }, 
+          borderRadius: '60px' 
+        } 
+      }
     },
     globalTexts: [
       { id: 'banner', placeholder: 'MTD TOPPERS', top: '16%', left: '20%', width: '60%', height: '300px', fontSize: '155px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px', isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } },

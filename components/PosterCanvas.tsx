@@ -1,3 +1,4 @@
+// filepath: components/PosterCanvas.tsx
 "use client";
 import React, { forwardRef, useRef, useState, useEffect } from 'react';
 import { Template } from '@/lib/templates';
@@ -61,9 +62,20 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
               const textValue = data || '';
               const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
               
+              let containerBgStyle: React.CSSProperties = {};
+              if (showDebug) {
+                containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
+              } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
+                containerBgStyle = { backgroundImage: `linear-gradient(${tb.boxStyle.gradientColors.direction || 'to right'}, ${tb.boxStyle.gradientColors.from}, ${tb.boxStyle.gradientColors.to})` };
+              } else if (tb.boxStyle?.backgroundColor) {
+                containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
+              } else {
+                containerBgStyle = { backgroundColor: 'transparent' };
+              }
+
               return (
                 <div key={field.id} className="absolute flex flex-col items-center justify-center text-center"
-                  style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : (tb.boxStyle?.backgroundColor || 'transparent'), borderRadius: tb.boxStyle?.borderRadius, padding: tb.boxStyle?.padding, transform: tb.transform || 'none' }}
+                  style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : (tb.boxStyle?.border || 'none'), borderRadius: tb.boxStyle?.borderRadius, padding: tb.boxStyle?.padding, transform: tb.transform || 'none', ...containerBgStyle }}
                 >
                   <FitText gradientStyle={gradientStyle}>{textValue}</FitText>
                 </div>
@@ -84,10 +96,21 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
             const textValue = tb.id === 'banner' ? globalBanner : (tb.id === 'bottomBanner' ? globalBottomBanner : tb.placeholder);
             const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
 
+            let containerBgStyle: React.CSSProperties = {};
+            if (showDebug) {
+              containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
+            } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
+              containerBgStyle = { backgroundImage: `linear-gradient(${tb.boxStyle.gradientColors.direction || 'to right'}, ${tb.boxStyle.gradientColors.from}, ${tb.boxStyle.gradientColors.to})` };
+            } else if (tb.boxStyle?.backgroundColor) {
+              containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
+            } else {
+              containerBgStyle = { backgroundColor: 'transparent' };
+            }
+
             return (
               <div 
                 key={tb.id} className="absolute flex items-center justify-center text-center"
-                style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20, WebkitTextStroke: tb.strokeWidth && tb.strokeColor && !tb.isCurved ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : (tb.boxStyle?.backgroundColor || 'transparent'), borderRadius: tb.boxStyle?.borderRadius, padding: tb.boxStyle?.padding, transform: tb.transform || 'none' }}
+                style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20, WebkitTextStroke: tb.strokeWidth && tb.strokeColor && !tb.isCurved ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : (tb.boxStyle?.border || 'none'), borderRadius: tb.boxStyle?.borderRadius, padding: tb.boxStyle?.padding, transform: tb.transform || 'none', ...containerBgStyle }}
               >
                 {tb.isCurved && tb.curvePath ? (
                   <svg width="100%" height="100%" viewBox="0 0 2100 300" style={{ overflow: 'visible' }}>
@@ -119,9 +142,19 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   const baseMerged = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
                   const hasActiveOverride = showTeamInput && baseMerged.activeTeamOverride && baseMerged.activeTeamOverride.active !== false;
                   
-                  // FIX: Safely merge objects to prevent TS errors on Vercel
+                  // Safely merge objects to prevent TS errors on Vercel
                   const overrideParams = hasActiveOverride ? baseMerged.activeTeamOverride : {};
+                  
+                  // Deep Merge BoxStyle Object
                   const mergedBoxStyle = { ...(baseMerged.boxStyle || {}), ...(overrideParams?.boxStyle || {}) };
+                  if (baseMerged.boxStyle?.gradientColors || overrideParams?.boxStyle?.gradientColors) {
+                      mergedBoxStyle.gradientColors = {
+                          ...(baseMerged.boxStyle?.gradientColors || {}),
+                          ...(overrideParams?.boxStyle?.gradientColors || {})
+                      };
+                  }
+                  
+                  // Deep Merge Main Text Gradient Object
                   const mergedGradientColors = { ...(baseMerged.gradientColors || {}), ...(overrideParams?.gradientColors || {}) };
                   
                   const tb = { 
@@ -136,16 +169,27 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   const valueGradientStyle = tb.isValueGradient && tb.valueGradientColors ? { backgroundImage: `linear-gradient(${tb.valueGradientColors.direction || 'to right'}, ${tb.valueGradientColors.from}, ${tb.valueGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
                   const unitGradientStyle = tb.isUnitGradient && tb.unitGradientColors ? { backgroundImage: `linear-gradient(${tb.unitGradientColors.direction || 'to right'}, ${tb.unitGradientColors.from}, ${tb.unitGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
 
+                  let containerBgStyle: React.CSSProperties = {};
+                  if (showDebug) {
+                    containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
+                  } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
+                    containerBgStyle = { backgroundImage: `linear-gradient(${tb.boxStyle.gradientColors.direction || 'to right'}, ${tb.boxStyle.gradientColors.from}, ${tb.boxStyle.gradientColors.to})` };
+                  } else if (tb.boxStyle?.backgroundColor) {
+                    containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
+                  } else {
+                    containerBgStyle = { backgroundColor: 'transparent' };
+                  }
+
                   return (
                     <div key={tb.id} className="absolute flex flex-col items-center justify-center text-center" 
                       style={{ 
                         top: tb.top, left: tb.left, width: tb.width, height: tb.height, 
                         fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none', zIndex: 20, 
                         WebkitTextStroke: tb.strokeWidth && tb.strokeColor ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, 
-                        border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', 
-                        backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : (tb.boxStyle?.backgroundColor || 'transparent'),
+                        border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : (tb.boxStyle?.border || 'none'), 
                         borderRadius: tb.boxStyle?.borderRadius,
-                        padding: tb.boxStyle?.padding
+                        padding: tb.boxStyle?.padding,
+                        ...containerBgStyle
                       }}>
                       
                       <FitText gradientStyle={gradientStyle}>
