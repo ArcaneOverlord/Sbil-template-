@@ -19,23 +19,16 @@ interface PosterProps {
 
 const DEBUG_MODE = false; 
 
-// NEW: Auto-Scaling Text Engine
-// Measures text width and smoothly squishes it if it overflows the bounding box.
 const FitText = ({ children, gradientStyle }: { children: React.ReactNode, gradientStyle: React.CSSProperties }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!containerRef.current || !textRef.current) return;
-    
-    // Temporarily reset scale to measure the true natural width of the text
     textRef.current.style.transform = 'scale(1)';
-    
     const containerWidth = containerRef.current.clientWidth;
     const textWidth = textRef.current.scrollWidth;
-
     if (textWidth > containerWidth && containerWidth > 0) {
-      // If it overflows, calculate the exact ratio needed to squeeze it in (with a 2% safety margin)
       const squeezeRatio = (containerWidth / textWidth) * 0.98;
       textRef.current.style.transform = `scale(${squeezeRatio})`;
     }
@@ -43,16 +36,7 @@ const FitText = ({ children, gradientStyle }: { children: React.ReactNode, gradi
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
-      <span 
-        ref={textRef} 
-        style={{ 
-          lineHeight: '1.1', 
-          whiteSpace: 'nowrap', // Forces text onto one line so it squeezes instead of wrapping
-          display: 'inline-block',
-          transformOrigin: 'center',
-          ...gradientStyle 
-        }}
-      >
+      <span ref={textRef} style={{ lineHeight: '1.1', whiteSpace: 'nowrap', display: 'inline-block', transformOrigin: 'center', ...gradientStyle }}>
         {children}
       </span>
     </div>
@@ -70,7 +54,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
           
           <img src={template.background} alt="Template" className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: 10 }} />
 
-          {/* RENDER DYNAMIC CUSTOM FIELDS */}
           {template.customFields && template.customFields.map((field) => {
             const data = customData[field.id];
             
@@ -81,25 +64,16 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
               
               return (
                 <div key={field.id} className="absolute flex flex-col items-center justify-center text-center"
-                  style={{
-                    top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20,
-                    border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : 'transparent', transform: tb.transform || 'none'
-                  }}
+                  style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : (tb.boxStyle?.backgroundColor || 'transparent'), borderRadius: tb.boxStyle?.borderRadius, padding: tb.boxStyle?.padding, transform: tb.transform || 'none' }}
                 >
                   <FitText gradientStyle={gradientStyle}>{textValue}</FitText>
                 </div>
               );
             } 
-            
             if (field.type === 'image' && field.imageConfig && data?.url) {
               const ib = field.imageConfig;
               return (
-                <div key={field.id} className="absolute overflow-hidden"
-                  style={{
-                    top: ib.top, left: ib.left, width: ib.width, height: ib.height, borderRadius: ib.borderRadius, backgroundColor: ib.backgroundColor,
-                    borderColor: ib.borderColor, borderWidth: ib.borderWidth, borderStyle: 'solid', zIndex: ib.zIndex, opacity: ib.opacity
-                  }}
-                >
+                <div key={field.id} className="absolute overflow-hidden" style={{ top: ib.top, left: ib.left, width: ib.width, height: ib.height, borderRadius: ib.borderRadius, backgroundColor: ib.backgroundColor, borderColor: ib.borderColor, borderWidth: ib.borderWidth, borderStyle: 'solid', zIndex: ib.zIndex, opacity: ib.opacity }}>
                   <img src={data.url} alt={field.label} className="w-full h-full object-contain" style={{ transform: `scale(${data.scale}) translate(${data.x}px, ${data.y}px)`, transformOrigin: 'center' }} />
                 </div>
               );
@@ -107,13 +81,12 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
             return null;
           })}
 
-          {/* RENDER GLOBAL TEXTS (Top & Bottom Banners) */}
           {template.globalTexts && template.globalTexts.map((tb) => {
             const textValue = tb.id === 'banner' ? globalBanner : (tb.id === 'bottomBanner' ? globalBottomBanner : tb.placeholder);
             return (
               <div 
                 key={tb.id} className="absolute flex items-center justify-center text-center"
-                style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20, WebkitTextStroke: tb.strokeWidth && tb.strokeColor && !tb.isCurved ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : 'transparent', transform: tb.transform || 'none' }}
+                style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, zIndex: 20, WebkitTextStroke: tb.strokeWidth && tb.strokeColor && !tb.isCurved ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : (tb.boxStyle?.backgroundColor || 'transparent'), borderRadius: tb.boxStyle?.borderRadius, padding: tb.boxStyle?.padding, transform: tb.transform || 'none' }}
               >
                 {tb.isCurved && tb.curvePath ? (
                   <svg width="100%" height="100%" viewBox="0 0 2100 300" style={{ overflow: 'visible' }}>
@@ -129,7 +102,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
             );
           })}
 
-          {/* RENDER INDIVIDUAL ACHIEVER SLOTS */}
           {template.slots.map((slot, index) => {
             const achiever = achievers[index];
             if (!achiever) return null;
@@ -141,17 +113,32 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                 </div>
 
                 {slot.textBoxes.map((baseTb) => {
-                  
                   if (baseTb.id === 'team' && !showTeamInput) return null;
-
-                  const tb = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
+                  
+                  // THEME & CONDITIONAL OVERRIDE MERGE
+                  // 1. Get base template theme
+                  // 2. Add specific slot coordinates
+                  // 3. If showTeamInput is ON and this text box has an activeTeamOverride, apply the override coordinates!
+                  const overrideParams = (showTeamInput && baseTb.activeTeamOverride) ? baseTb.activeTeamOverride : {};
+                  const tb = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb, ...overrideParams };
+                  
                   const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
                   const prefixGradientStyle = tb.isPrefixGradient && tb.prefixGradientColors ? { backgroundImage: `linear-gradient(${tb.prefixGradientColors.direction || 'to right'}, ${tb.prefixGradientColors.from}, ${tb.prefixGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
                   const valueGradientStyle = tb.isValueGradient && tb.valueGradientColors ? { backgroundImage: `linear-gradient(${tb.valueGradientColors.direction || 'to right'}, ${tb.valueGradientColors.from}, ${tb.valueGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
                   const unitGradientStyle = tb.isUnitGradient && tb.unitGradientColors ? { backgroundImage: `linear-gradient(${tb.unitGradientColors.direction || 'to right'}, ${tb.unitGradientColors.from}, ${tb.unitGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
 
                   return (
-                    <div key={tb.id} className="absolute flex flex-col items-center justify-center text-center" style={{ top: tb.top, left: tb.left, width: tb.width, height: tb.height, fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none', zIndex: 20, WebkitTextStroke: tb.strokeWidth && tb.strokeColor ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : 'transparent' }}>
+                    <div key={tb.id} className="absolute flex flex-col items-center justify-center text-center" 
+                      style={{ 
+                        top: tb.top, left: tb.left, width: tb.width, height: tb.height, 
+                        fontSize: tb.fontSize, fontWeight: tb.fontWeight, color: tb.color, transform: tb.transform || 'none', zIndex: 20, 
+                        WebkitTextStroke: tb.strokeWidth && tb.strokeColor ? `${tb.strokeWidth} ${tb.strokeColor}` : undefined, 
+                        border: showDebug ? '4px dashed rgba(239, 68, 68, 0.8)' : 'none', 
+                        // Automatically applies the boxStyle background shape (like a pill or rectangle)
+                        backgroundColor: showDebug ? 'rgba(239, 68, 68, 0.2)' : (tb.boxStyle?.backgroundColor || 'transparent'),
+                        borderRadius: tb.boxStyle?.borderRadius,
+                        padding: tb.boxStyle?.padding
+                      }}>
                       
                       <FitText gradientStyle={gradientStyle}>
                         {tb.id === 'detail' ? (
