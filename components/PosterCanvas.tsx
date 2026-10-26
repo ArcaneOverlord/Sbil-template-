@@ -17,7 +17,7 @@ interface PosterProps {
   customData: Record<string, any>; 
 }
 
-const DEBUG_MODE = false; 
+const DEBUG_MODE = true; 
 
 const FitText = ({ children, gradientStyle }: { children: React.ReactNode, gradientStyle: React.CSSProperties }) => {
   const containerRef = useRef<HTMLDivElement>(null);
