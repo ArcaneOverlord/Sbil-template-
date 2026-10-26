@@ -1,44 +1,64 @@
+// ============================================================================
+// POSTERGEN TEMPLATE ENGINE CONFIGURATION
+// This file defines the layout, typography, and styling for all posters.
+// ============================================================================
+
+/**
+ * TeamOverrideConfig defines the properties that replace the base text properties 
+ * when the "Enable Achiever Team Input" global setting is toggled ON.
+ */
+export interface TeamOverrideConfig extends Partial<Omit<TextConfig, 'id' | 'activeTeamOverride'>> {
+  // MASTER SWITCH: Set to false to disable this override without deleting your values.
+  active?: boolean; 
+}
+
 export interface TextConfig {
   id: string;          
   placeholder?: string;
+  
+  // --- 1. BASE POSITIONING ---
+  // Coordinates are percentages relative to the 3508x4961 canvas.
   top: string;         
   left: string;
   width: string;
   height: string;
   
-  // ========================================================================
-  // ABSOLUTE OVERRIDE ENGINE:
-  // When Team Input is ON, ANY property you put inside this object will 
-  // replace the base properties above it. You can change top, left, fontSize, 
-  // color, or even the boxStyle dynamically!
-  // ========================================================================
-  activeTeamOverride?: Partial<Omit<TextConfig, 'id' | 'activeTeamOverride'>>;
+  // --- 2. CONDITIONAL LAYOUT SHIFTING (MASS ARRANGE) ---
+  // When Team Input is ON, ANY property placed in here replaces the base properties.
+  // You can change top, left, fontSize, color, or even the boxStyle dynamically.
+  activeTeamOverride?: TeamOverrideConfig;
   
-  // ========================================================================
-  // ROUND EDGE BLOCK CONTROLS:
-  // Use this to add shapes behind text. To hide it, either delete this block 
-  // or set backgroundColor to 'transparent'.
-  // ========================================================================
+  // --- 3. BACKGROUND SHAPE (ROUND EDGE BLOCK) ---
+  // Renders a colored shape directly behind the text. 
+  // To hide it, delete this block or set backgroundColor to 'transparent'.
   boxStyle?: {
-    backgroundColor?: string; // e.g., 'rgba(0,0,0,0.5)' or 'transparent'
-    borderRadius?: string;    // Adjust roundness here (e.g., '20px' or '100px')
-    border?: string;          // e.g., '2px solid #ffffff'
+    backgroundColor?: string; // e.g., 'rgba(0,0,0,0.4)'
+    borderRadius?: string;    // e.g., '60px' for pill shape
+    border?: string;          
     padding?: string;         
   };
   
+  // --- 4. BASE TYPOGRAPHY ---
   fontSize?: string;
   fontWeight?: string;
   color?: string;
   transform?: string;  
   
+  // --- 5. SVG CURVED PATH ENGINE ---
+  // curvePath uses standard SVG 'd' syntax (e.g., 'M startX,startY Q curveX,curveY endX,endY')
   isCurved?: boolean;
   curvePath?: string; 
-  strokeColor?: string;
+  strokeColor?: string; // Outline color (makes text ultra-bold)
   strokeWidth?: string;
 
+  // --- 6. MAIN TEXT GRADIENT ---
   isGradient?: boolean;
   gradientColors?: { from: string; to: string; direction?: string };
   
+  // ==========================================================================
+  // 7. 3-PART METRIC STYLING (Used ONLY for the 'detail' ID)
+  // Styles "Prem:" (Prefix), "12.34" (Value), and "Cr" (Unit) independently.
+  // ==========================================================================
   valueFontSize?: string;
   valueFontWeight?: string;
   valueColor?: string;
@@ -71,6 +91,7 @@ export interface ImageConfig {
   opacity: number; 
 }
 
+// Blueprint for dynamic template-specific items (Sponsor logos, Dates, etc)
 export interface CustomField {
   id: string;
   type: 'text' | 'image';
@@ -93,7 +114,7 @@ export interface Template {
   thumbnail: string;
   background: string;
   globalTexts?: TextConfig[]; 
-  defaultTextStyles?: Record<string, Partial<TextConfig>>; 
+  defaultTextStyles?: Record<string, Partial<TextConfig>>; // The Master Theme for the template
   customFields?: CustomField[]; 
   slots: SlotConfig[];
 }
@@ -126,19 +147,19 @@ export const posterTemplates: Template[] = [
       {
         id: 0, imageBox: { top: '27.5%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [ 
-          // Example: When Team is active, we move the Name UP to 31% and SHRINK the font to 140px so it fits better!
-          { id: 'name', top: '34.5%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { top: '31%', fontSize: '140px' } }, 
-          { id: 'detail', top: '41.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { top: '38%' } }, 
+          // Set active: false if you want to temporarily disable this mass-arrange override
+          { id: 'name', top: '34.5%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: true, top: '31%', fontSize: '140px' } }, 
+          { id: 'detail', top: '41.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '38%' } }, 
           { id: 'team', top: '46%', left: '48%', width: '1600px', height: '120px' } 
         ]
       },
       {
         id: 1, imageBox: { top: '49%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
-        textBoxes: [ { id: 'name', top: '56%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { top: '52.5%', fontSize: '140px' } }, { id: 'detail', top: '62.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { top: '59.5%' } }, { id: 'team', top: '67%', left: '48%', width: '1600px', height: '120px' } ]
+        textBoxes: [ { id: 'name', top: '56%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: true, top: '52.5%', fontSize: '140px' } }, { id: 'detail', top: '62.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '59.5%' } }, { id: 'team', top: '67%', left: '48%', width: '1600px', height: '120px' } ]
       },
       {
         id: 2, imageBox: { top: '70%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
-        textBoxes: [ { id: 'name', top: '76.3%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { top: '73%', fontSize: '140px' } }, { id: 'detail', top: '82.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { top: '79.5%' } }, { id: 'team', top: '87%', left: '48%', width: '1600px', height: '120px' } ]
+        textBoxes: [ { id: 'name', top: '76.3%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: true, top: '73%', fontSize: '140px' } }, { id: 'detail', top: '82.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '79.5%' } }, { id: 'team', top: '87%', left: '48%', width: '1600px', height: '120px' } ]
       }
     ]
   },
@@ -169,15 +190,15 @@ export const posterTemplates: Template[] = [
     slots: [
       {
         id: 0, imageBox: { top: '21%', left: '28%', width: '1500px', height: '1400px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
-        textBoxes: [ { id: 'name', top: '47.5%', left: '33%', width: '1200px', height: '220px', fontSize: '150px', activeTeamOverride: { top: '46%' } }, { id: 'detail', top: '51.1%', left: '33%', width: '1200px', height: '180px', prefixFontSize: '100px', valueFontSize: '140px', unitFontSize: '120', activeTeamOverride: { top: '49%' } }, { id: 'team', top: '54%', left: '33%', width: '1200px', height: '120px' } ]
+        textBoxes: [ { id: 'name', top: '47.5%', left: '33%', width: '1200px', height: '220px', fontSize: '150px', activeTeamOverride: { active: true, top: '46%' } }, { id: 'detail', top: '51.1%', left: '33%', width: '1200px', height: '180px', prefixFontSize: '100px', valueFontSize: '140px', unitFontSize: '120', activeTeamOverride: { active: true, top: '49%' } }, { id: 'team', top: '54%', left: '33%', width: '1200px', height: '120px' } ]
       },
       {
         id: 1, imageBox: { top: '56%', left: '13%', width: '1000px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
-        textBoxes: [ { id: 'name', top: '74.3%', left: '13.7%', width: '900px', height: '180px', activeTeamOverride: { top: '72%' } }, { id: 'detail', top: '77.4%', left: '13.7%', width: '900px', height: '150px', activeTeamOverride: { top: '75%' } }, { id: 'team', top: '81%', left: '13.7%', width: '900px', height: '120px' } ]
+        textBoxes: [ { id: 'name', top: '74.3%', left: '13.7%', width: '900px', height: '180px', activeTeamOverride: { active: true, top: '72%' } }, { id: 'detail', top: '77.4%', left: '13.7%', width: '900px', height: '150px', activeTeamOverride: { active: true, top: '75%' } }, { id: 'team', top: '81%', left: '13.7%', width: '900px', height: '120px' } ]
       },
       {
         id: 2, imageBox: { top: '56%', left: '60.7%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
-        textBoxes: [ { id: 'name', top: '74.3%', left: '61%', width: '900px', height: '180px', activeTeamOverride: { top: '72%' } }, { id: 'detail', top: '77.4%', left: '61%', width: '900px', height: '150px', activeTeamOverride: { top: '75%' } }, { id: 'team', top: '81%', left: '61%', width: '900px', height: '120px' } ]
+        textBoxes: [ { id: 'name', top: '74.3%', left: '61%', width: '900px', height: '180px', activeTeamOverride: { active: true, top: '72%' } }, { id: 'detail', top: '77.4%', left: '61%', width: '900px', height: '150px', activeTeamOverride: { active: true, top: '75%' } }, { id: 'team', top: '81%', left: '61%', width: '900px', height: '120px' } ]
       }
     ]
   },
@@ -210,28 +231,24 @@ export const posterTemplates: Template[] = [
       {
         id: 0, imageBox: { top: '21%', left: '28%', width: '1500px', height: '1400px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [ 
-          { id: 'name', top: '47.5%', left: '33%', width: '1200px', height: '220px', fontSize: '160px', activeTeamOverride: { top: '45%' } }, 
-          { id: 'detail', top: '51.1%', left: '33%', width: '1200px', height: '180px', prefixFontSize: '100px', valueFontSize: '140px', unitFontSize: '120px', activeTeamOverride: { top: '48.5%' } }, 
-          { 
-            id: 'team', top: '54%', left: '33%', width: '1200px', height: '120px', 
-            // Control the Box Style right here!
-            boxStyle: { backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: '60px' } 
-          } 
+          { id: 'name', top: '47.5%', left: '33%', width: '1200px', height: '220px', fontSize: '160px', activeTeamOverride: { active: true, top: '45%' } }, 
+          { id: 'detail', top: '51.1%', left: '33%', width: '1200px', height: '180px', prefixFontSize: '100px', valueFontSize: '140px', unitFontSize: '120px', activeTeamOverride: { active: true, top: '48.5%' } }, 
+          { id: 'team', top: '54%', left: '33%', width: '1200px', height: '120px', boxStyle: { backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: '60px' } } 
         ]
       },
       {
         id: 1, imageBox: { top: '56%', left: '13%', width: '1000px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [ 
-          { id: 'name', top: '74.3%', left: '13.7%', width: '900px', height: '180px', activeTeamOverride: { top: '72%' } }, 
-          { id: 'detail', top: '77.4%', left: '13.7%', width: '900px', height: '150px', activeTeamOverride: { top: '75%' } }, 
+          { id: 'name', top: '74.3%', left: '13.7%', width: '900px', height: '180px', activeTeamOverride: { active: true, top: '72%' } }, 
+          { id: 'detail', top: '77.4%', left: '13.7%', width: '900px', height: '150px', activeTeamOverride: { active: true, top: '75%' } }, 
           { id: 'team', top: '81%', left: '13.7%', width: '900px', height: '120px', boxStyle: { backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: '60px' } } 
         ]
       },
       {
         id: 2, imageBox: { top: '56%', left: '60.7%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [ 
-          { id: 'name', top: '74.3%', left: '61%', width: '900px', height: '180px', activeTeamOverride: { top: '72%' } }, 
-          { id: 'detail', top: '77.4%', left: '61%', width: '900px', height: '150px', activeTeamOverride: { top: '75%' } }, 
+          { id: 'name', top: '74.3%', left: '61%', width: '900px', height: '180px', activeTeamOverride: { active: true, top: '72%' } }, 
+          { id: 'detail', top: '77.4%', left: '61%', width: '900px', height: '150px', activeTeamOverride: { active: true, top: '75%' } }, 
           { id: 'team', top: '81%', left: '61%', width: '900px', height: '120px', boxStyle: { backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: '60px' } } 
         ]
       }

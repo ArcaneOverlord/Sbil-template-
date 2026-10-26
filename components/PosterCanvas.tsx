@@ -17,7 +17,7 @@ interface PosterProps {
   customData: Record<string, any>; 
 }
 
-const DEBUG_MODE = true; 
+const DEBUG_MODE = false; 
 
 const FitText = ({ children, gradientStyle }: { children: React.ReactNode, gradientStyle: React.CSSProperties }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -115,10 +115,11 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                 {slot.textBoxes.map((baseTb) => {
                   if (baseTb.id === 'team' && !showTeamInput) return null;
                   
-                  // ABSOLUTE OVERRIDE DEEP MERGE: 
-                  // If team is active, we safely merge nested objects like boxStyle and gradients
                   const baseMerged = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
-                  const overrideParams = (showTeamInput && baseMerged.activeTeamOverride) ? baseMerged.activeTeamOverride : {};
+                  
+                  // NEW: Only apply the override if showTeamInput is true AND active is not set to false
+                  const hasActiveOverride = showTeamInput && baseMerged.activeTeamOverride && baseMerged.activeTeamOverride.active !== false;
+                  const overrideParams = hasActiveOverride ? baseMerged.activeTeamOverride : {};
                   
                   const tb = { 
                     ...baseMerged, 
