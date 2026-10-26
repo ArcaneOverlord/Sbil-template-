@@ -34,14 +34,15 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [viewportHeight, setViewportHeight] = useState('100vh');
   const [isDesktop, setIsDesktop] = useState(false);
 
-  const [globalBanner, setGlobalBanner] = useState('MTD TOPPERS');
+  // UNIVERSAL BANNER STATES
+  const [bannerType, setBannerType] = useState<'MTD' | 'YTD'>('MTD');
+  const [showMonth, setShowMonth] = useState(false); 
+  const [selectedMonth, setSelectedMonth] = useState('OCTOBER');
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  
   const [globalBottomBanner, setGlobalBottomBanner] = useState('TEAM KATTAKADA');
   const [globalMetric, setGlobalMetric] = useState('Prem');
   const [globalUnit, setGlobalUnit] = useState('Lakh');
-  
-  // NEW: Banner Month Toggle States
-  const [showMonth, setShowMonth] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState('OCTOBER');
 
   const [customData, setCustomData] = useState<Record<string, any>>(() => {
     const initData: Record<string, any> = {};
@@ -148,8 +149,14 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     } catch (err) { alert('Export failed.'); } finally { setIsExporting(false); }
   };
 
-  // NEW: Dynamically constructs the banner string if the month toggle is on
-  const computedBanner = showMonth ? `${selectedMonth} ${globalBanner}` : globalBanner;
+  // UNIVERSAL BANNER LOGIC ENGINE
+  let computedBanner = '';
+  if (bannerType === 'YTD') {
+    computedBanner = `YTD TOPPERS ${selectedYear}`;
+  } else {
+    // MTD Logic
+    computedBanner = showMonth ? `MTD ${selectedMonth} ${selectedYear}` : `MTD TOPPERS ${selectedYear}`;
+  }
 
   return (
     <main 
@@ -197,7 +204,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             ref={posterRef} 
             template={template} 
             achievers={achievers} 
-            globalBanner={computedBanner} // Passed the new computed string here
+            globalBanner={computedBanner} // Passed the computed string
             globalBottomBanner={globalBottomBanner}
             globalMetric={globalMetric} 
             isExporting={isExporting} 
@@ -231,41 +238,57 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                   <label className="text-xs text-slate-500 mb-1.5 block font-medium">Top Banner</label>
                   <div className="flex bg-slate-900 border border-slate-700 rounded-lg p-1 mb-2">
                     <button 
-                      className={`flex-1 py-1 text-sm font-semibold rounded-md transition-colors ${globalBanner === 'MTD TOPPERS' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
-                      onClick={() => setGlobalBanner('MTD TOPPERS')}
+                      className={`flex-1 py-1 text-sm font-semibold rounded-md transition-colors ${bannerType === 'MTD' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                      onClick={() => setBannerType('MTD')}
                     >
                       MTD
                     </button>
                     <button 
-                      className={`flex-1 py-1 text-sm font-semibold rounded-md transition-colors ${globalBanner === 'YTD TOPPERS' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
-                      onClick={() => setGlobalBanner('YTD TOPPERS')}
+                      className={`flex-1 py-1 text-sm font-semibold rounded-md transition-colors ${bannerType === 'YTD' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                      onClick={() => setBannerType('YTD')}
                     >
                       YTD
                     </button>
                   </div>
-                  {/* NEW: Month Toggle UI */}
-                  <div className="flex flex-col gap-2 mt-2">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400">
-                      <input 
-                        type="checkbox" 
-                        checked={showMonth} 
-                        onChange={(e) => setShowMonth(e.target.checked)} 
-                        className="rounded border-slate-700 bg-slate-900 text-blue-600 accent-blue-600" 
-                      />
-                      Add Month Prefix
-                    </label>
-                    {showMonth && (
-                      <select
-                        value={selectedMonth}
-                        onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-blue-500 text-white"
-                      >
-                        {['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'].map(m => (
-                          <option key={m} value={m}>{m}</option>
-                        ))}
-                      </select>
-                    )}
+                  
+                  {/* Universal Year Dropdown */}
+                  <div className="mb-2">
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-blue-500 text-white"
+                    >
+                      {['2024', '2025', '2026', '2027', '2028', '2029', '2030'].map(y => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
                   </div>
+
+                  {/* Month Checkbox & Dropdown (Hidden if YTD) */}
+                  {bannerType === 'MTD' && (
+                    <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-slate-800">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400">
+                        <input 
+                          type="checkbox" 
+                          checked={showMonth} 
+                          onChange={(e) => setShowMonth(e.target.checked)} 
+                          className="rounded border-slate-700 bg-slate-900 text-blue-600 accent-blue-600" 
+                        />
+                        Replace 'TOPPERS' with Month
+                      </label>
+                      {showMonth && (
+                        <select
+                          value={selectedMonth}
+                          onChange={(e) => setSelectedMonth(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-blue-500 text-white"
+                        >
+                          {['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'].map(m => (
+                            <option key={m} value={m}>{m}</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="w-1/2">
