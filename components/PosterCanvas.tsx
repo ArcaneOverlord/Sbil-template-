@@ -8,17 +8,18 @@ interface PosterProps {
   globalBottomBanner: string;
   globalMetric: string;
   isExporting: boolean;
+  showTeamInput: boolean; // NEW: Receives the master settings toggle
   achievers: {
     [key: string]: any; 
     image: string | null;
     imgConfig: { scale: number; x: number; y: number };
   }[];
-  customData: Record<string, any>; // NEW: Receives dynamic data
+  customData: Record<string, any>; 
 }
 
 const DEBUG_MODE = false; 
 
-const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, globalBanner, globalBottomBanner, globalMetric, isExporting, achievers, customData }, ref) => {
+const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, globalBanner, globalBottomBanner, globalMetric, isExporting, showTeamInput, achievers, customData }, ref) => {
   
   const showDebug = DEBUG_MODE && !isExporting;
 
@@ -98,6 +99,10 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                 </div>
 
                 {slot.textBoxes.map((baseTb) => {
+                  
+                  // NEW: Hide the Team text box entirely if the Global Settings toggle is turned off
+                  if (baseTb.id === 'team' && !showTeamInput) return null;
+
                   const tb = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
                   const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
                   const prefixGradientStyle = tb.isPrefixGradient && tb.prefixGradientColors ? { backgroundImage: `linear-gradient(${tb.prefixGradientColors.direction || 'to right'}, ${tb.prefixGradientColors.from}, ${tb.prefixGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};

@@ -11,6 +11,7 @@ interface AchieverData {
   name: string;
   metricValue: string;
   metricUnit: string;
+  team?: string; // NEW
   image: string | null;
   imgConfig: { scale: number; x: number; y: number };
 }
@@ -24,6 +25,10 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const posterRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
+  
+  // Accidental Scroll Protection State
+  const [editingImageIdx, setEditingImageIdx] = useState<number | null>(null);
+  
   const [drawerHeight, setDrawerHeight] = useState(15); 
   const [isDraggingDrawer, setIsDraggingDrawer] = useState(false);
   const [isPanEnabled, setIsPanEnabled] = useState(false);
@@ -34,15 +39,15 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   const [viewportHeight, setViewportHeight] = useState('100vh');
   const [isDesktop, setIsDesktop] = useState(false);
 
-  // UNIVERSAL BANNER STATES
+  // Global Settings States
   const [bannerType, setBannerType] = useState<'MTD' | 'YTD'>('MTD');
   const [showMonth, setShowMonth] = useState(false); 
   const [selectedMonth, setSelectedMonth] = useState('OCTOBER');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
-  
   const [globalBottomBanner, setGlobalBottomBanner] = useState('TEAM KATTAKADA');
   const [globalMetric, setGlobalMetric] = useState('Prem');
   const [globalUnit, setGlobalUnit] = useState('Lakh');
+  const [showTeamInput, setShowTeamInput] = useState(false); // NEW
 
   const [customData, setCustomData] = useState<Record<string, any>>(() => {
     const initData: Record<string, any> = {};
@@ -54,7 +59,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
   });
 
   const [achievers, setAchievers] = useState<AchieverData[]>(
-    template.slots.map(() => ({ name: '', metricValue: '', metricUnit: 'Lakh', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
+    template.slots.map(() => ({ name: '', team: '', metricValue: '', metricUnit: 'Lakh', image: null, imgConfig: { scale: 1, x: 0, y: 0 } }))
   );
 
   useEffect(() => {
@@ -64,7 +69,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     };
     handleResize();
     window.addEventListener('resize', handleResize);
-    
     window.history.pushState(null, '', window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, '', window.location.href);
@@ -73,7 +77,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     window.addEventListener('popstate', handlePopState);
     const handleBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('popstate', handlePopState);
@@ -124,6 +127,8 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
         newAchievers[index].imgConfig = { scale: 1, x: 0, y: 0 }; 
         setAchievers(newAchievers);
         setActiveSlot(index); 
+        // Auto-open the image adjust panel once uploaded
+        setEditingImageIdx(index);
         if (!isDesktop) setDrawerHeight(65);
       };
       reader.readAsDataURL(e.target.files[0]);
@@ -140,6 +145,7 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     try {
       setIsExporting(true);
       setIsPanEnabled(false); 
+      setEditingImageIdx(null); // Close active image adjustments before export
       await new Promise(r => setTimeout(r, 150)); 
       const dataUrl = await toPng(posterRef.current, { quality: 1, pixelRatio: 1 });
       const link = document.createElement('a');
@@ -149,12 +155,10 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
     } catch (err) { alert('Export failed.'); } finally { setIsExporting(false); }
   };
 
-  // UNIVERSAL BANNER LOGIC ENGINE
   let computedBanner = '';
   if (bannerType === 'YTD') {
     computedBanner = `YTD TOPPERS ${selectedYear}`;
   } else {
-    // MTD Logic
     computedBanner = showMonth ? `MTD ${selectedMonth} ${selectedYear}` : `MTD TOPPERS ${selectedYear}`;
   }
 
@@ -204,10 +208,11 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
             ref={posterRef} 
             template={template} 
             achievers={achievers} 
-            globalBanner={computedBanner} // Passed the computed string
+            globalBanner={computedBanner} 
             globalBottomBanner={globalBottomBanner}
             globalMetric={globalMetric} 
             isExporting={isExporting} 
+            showTeamInput={showTeamInput} // NEW
             customData={customData} 
           />
         </div>
@@ -251,7 +256,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     </button>
                   </div>
                   
-                  {/* Universal Year Dropdown */}
                   <div className="mb-2">
                     <select
                       value={selectedYear}
@@ -264,7 +268,6 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     </select>
                   </div>
 
-                  {/* Month Checkbox & Dropdown (Hidden if YTD) */}
                   {bannerType === 'MTD' && (
                     <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-slate-800">
                       <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400">
@@ -329,6 +332,20 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                   </select>
                 </div>
               </div>
+
+              {/* NEW: TEAM TEXT TOGGLE */}
+              <div className="pt-3 border-t border-slate-800 mt-2">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400 font-medium">
+                  <input 
+                    type="checkbox" 
+                    checked={showTeamInput} 
+                    onChange={(e) => setShowTeamInput(e.target.checked)} 
+                    className="rounded border-slate-700 bg-slate-900 text-blue-600 accent-blue-600 w-4 h-4" 
+                  />
+                  Enable Achiever Team Input
+                </label>
+              </div>
+
             </div>
           </div>
 
@@ -398,6 +415,18 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     placeholder="Enter Name" 
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
                   />
+
+                  {/* NEW: TEAM INPUT FIELD (Toggled Globally) */}
+                  {showTeamInput && (
+                    <input 
+                      type="text" value={achiever.team || ''}
+                      onFocus={() => handleInputFocus(idx)}
+                      onChange={(e) => handleTextChange(idx, 'team', e.target.value.toUpperCase())}
+                      placeholder="Enter Team Name (E.g. TVM BRANCH)" 
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors mt-1" 
+                    />
+                  )}
+
                   <div className="flex gap-2">
                     <div className="w-1/3 bg-slate-900/80 border border-slate-800 rounded-lg px-2 py-2 text-sm text-slate-500 flex items-center justify-center font-medium">
                       {globalMetric}
@@ -421,13 +450,28 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                     </select>
                   </div>
 
-                  <label className="flex items-center justify-center w-full h-12 border border-dashed border-slate-600 rounded-lg hover:border-blue-500 hover:bg-slate-800/50 cursor-pointer transition-colors mt-2">
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(idx, e)} />
-                    <div className="flex items-center gap-2 text-slate-400 text-sm"><ImagePlus size={16} />{achiever.image ? 'Change Photo' : 'Upload Photo'}</div>
-                  </label>
+                  {/* NEW: COLLAPSIBLE SAFE IMAGE ADJUSTMENTS */}
+                  <div className="flex gap-2 mt-2">
+                    <label className="flex-1 flex items-center justify-center h-11 border border-dashed border-slate-600 rounded-lg hover:border-blue-500 hover:bg-slate-800/50 cursor-pointer transition-colors">
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(idx, e)} />
+                      <div className="flex items-center gap-2 text-slate-400 text-sm">
+                        <ImagePlus size={16} />{achiever.image ? 'Change Photo' : 'Upload Photo'}
+                      </div>
+                    </label>
+                    {achiever.image && (
+                      <button 
+                        onClick={() => setEditingImageIdx(editingImageIdx === idx ? null : idx)} 
+                        className={`w-12 flex items-center justify-center rounded-lg border transition-colors ${editingImageIdx === idx ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_10px_rgba(37,99,235,0.4)]' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}
+                        title="Adjust Image Size and Position"
+                      >
+                        <Settings size={16} />
+                      </button>
+                    )}
+                  </div>
                   
-                  {achiever.image && (
-                    <div className="pt-3 border-t border-slate-700/50 mt-3 space-y-3 animate-in fade-in duration-300">
+                  {/* SLIDERS HIDDEN BEHIND TOGGLE BUTTON */}
+                  {achiever.image && editingImageIdx === idx && (
+                    <div className="p-4 bg-slate-900/80 border border-slate-700 rounded-xl mt-2 space-y-4 animate-in fade-in zoom-in-95 duration-200 shadow-inner">
                       <div className="flex items-center gap-3">
                         <Maximize size={14} className="text-slate-500 shrink-0" />
                         <input type="range" min="0.5" max="3" step="0.1" value={achiever.imgConfig.scale} onChange={(e) => handleImgConfigChange(idx, 'scale', parseFloat(e.target.value))} className="w-full accent-blue-500" />
@@ -439,8 +483,16 @@ export default function Editor(props: { params: Promise<{ id: string }> }) {
                            <input type="range" min="-300" max="300" step="10" value={achiever.imgConfig.y} onChange={(e) => handleImgConfigChange(idx, 'y', parseInt(e.target.value))} className="w-1/2 accent-slate-400" />
                         </div>
                       </div>
+                      <button 
+                        onClick={() => setEditingImageIdx(null)} 
+                        className="w-full mt-2 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 text-xs font-bold text-slate-300 rounded-lg transition-colors"
+                      >
+                        Done Adjusting
+                      </button>
                     </div>
                   )}
+                  {/* --------------------------------------- */}
+
                 </div>
               </div>
             ))}
