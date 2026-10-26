@@ -56,7 +56,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
 
           {template.customFields && template.customFields.map((field) => {
             const data = customData[field.id];
-            
             if (field.type === 'text' && field.textConfig) {
               const tb = field.textConfig;
               const textValue = data || '';
@@ -83,6 +82,8 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
 
           {template.globalTexts && template.globalTexts.map((tb) => {
             const textValue = tb.id === 'banner' ? globalBanner : (tb.id === 'bottomBanner' ? globalBottomBanner : tb.placeholder);
+            const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
+
             return (
               <div 
                 key={tb.id} className="absolute flex items-center justify-center text-center"
@@ -96,7 +97,7 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                     </text>
                   </svg>
                 ) : ( 
-                  <FitText gradientStyle={{}}>{textValue}</FitText>
+                  <FitText gradientStyle={gradientStyle}>{textValue}</FitText>
                 )}
               </div>
             );
@@ -116,16 +117,18 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   if (baseTb.id === 'team' && !showTeamInput) return null;
                   
                   const baseMerged = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
-                  
-                  // NEW: Only apply the override if showTeamInput is true AND active is not set to false
                   const hasActiveOverride = showTeamInput && baseMerged.activeTeamOverride && baseMerged.activeTeamOverride.active !== false;
+                  
+                  // FIX: Safely merge objects to prevent TS errors on Vercel
                   const overrideParams = hasActiveOverride ? baseMerged.activeTeamOverride : {};
+                  const mergedBoxStyle = { ...(baseMerged.boxStyle || {}), ...(overrideParams?.boxStyle || {}) };
+                  const mergedGradientColors = { ...(baseMerged.gradientColors || {}), ...(overrideParams?.gradientColors || {}) };
                   
                   const tb = { 
                     ...baseMerged, 
                     ...overrideParams,
-                    boxStyle: overrideParams.boxStyle ? { ...baseMerged.boxStyle, ...overrideParams.boxStyle } : baseMerged.boxStyle,
-                    gradientColors: overrideParams.gradientColors ? { ...baseMerged.gradientColors, ...overrideParams.gradientColors } : baseMerged.gradientColors
+                    boxStyle: Object.keys(mergedBoxStyle).length > 0 ? mergedBoxStyle : undefined,
+                    gradientColors: Object.keys(mergedGradientColors).length > 0 ? mergedGradientColors : undefined
                   };
                   
                   const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
