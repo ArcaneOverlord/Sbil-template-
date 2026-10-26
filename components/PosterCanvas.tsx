@@ -17,7 +17,7 @@ interface PosterProps {
   customData: Record<string, any>; 
 }
 
-const DEBUG_MODE = true; 
+const DEBUG_MODE = false; 
 
 // NEW: Auto-Scaling Text Engine
 // Measures text width and smoothly squishes it if it overflows the bounding box.
