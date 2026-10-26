@@ -107,31 +107,37 @@ export const posterTemplates: Template[] = [
       },
       team: { 
         placeholder: 'Enter Team',
-        fontSize: '90px', fontWeight: 'bold', color: '#cbd5e1',
+        fontSize: '80px', fontWeight: 'bold', color: '#060707',
         // NEW: Creates the rounded edge rectangle block behind the team text in V1
-        boxStyle: { backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: '60px' } 
+        boxStyle: { backgroundColor: '#eab308', borderRadius: '60px' } 
       }
     },
     globalTexts: [
-      { id: 'banner', placeholder: 'MTD TOPPERS', top: '16%', left: '20%', width: '60%', height: '300px', fontSize: '160px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px', isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } },
+      { id: 'banner', placeholder: 'MTD TOPPERS', top: '16%', left: '20%', width: '60%', height: '300px', fontSize: '155px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px', isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } },
       { id: 'bottomBanner', placeholder: 'TEAM KATTAKADA', top: '90%', left: '20%', width: '60%', height: '250px', fontSize: '140px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '4px' }
     ],
     slots: [
       {
         id: 0, imageBox: { top: '27.5%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
         textBoxes: [ 
-          { id: 'name', top: '34.5%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: true, top: '31%', fontSize: '140px' } }, 
-          { id: 'detail', top: '41.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '38%' } }, 
-          { id: 'team', top: '46%', left: '48%', width: '1600px', height: '120px' } 
+          { id: 'name', top: '34.5%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '31%', fontSize: '140px' } }, 
+          { id: 'detail', top: '41.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '40%' } }, 
+          { id: 'team', top: '43.5%', left: '51%', width: '1400px', height: '90px' } 
         ]
       },
       {
         id: 1, imageBox: { top: '49%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
-        textBoxes: [ { id: 'name', top: '56%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: true, top: '52.5%', fontSize: '140px' } }, { id: 'detail', top: '62.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '59.5%' } }, { id: 'team', top: '67%', left: '48%', width: '1600px', height: '120px' } ]
+        textBoxes: [ 
+          { id: 'name', top: '56%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '52.5%', fontSize: '140px' } }, 
+          { id: 'detail', top: '62.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '61.3%' } }, 
+          { id: 'team', top: '64.8%', left: '51%', width: '1400px', height: '90px' } ]
       },
       {
         id: 2, imageBox: { top: '70%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
-        textBoxes: [ { id: 'name', top: '76.3%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: true, top: '73%', fontSize: '140px' } }, { id: 'detail', top: '82.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '79.5%' } }, { id: 'team', top: '87%', left: '48%', width: '1600px', height: '120px' } ]
+        textBoxes: [ 
+          { id: 'name', top: '76.3%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '73%', fontSize: '140px' } }, 
+          { id: 'detail', top: '82.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '81.7%' } }, 
+          { id: 'team', top: '85n%', left: '51%', width: '1400px', height: '90px' } ]
       }
     ]
   },
