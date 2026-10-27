@@ -1,6 +1,18 @@
-// filepath: lib/templates.ts
+// ============================================================================
+// POSTERGEN TEMPLATE ENGINE CONFIGURATION
+// ============================================================================
+
 export interface TeamOverrideConfig extends Partial<Omit<TextConfig, 'id' | 'activeTeamOverride'>> {
   active?: boolean; 
+}
+
+// NEW: Universal Gradient Definition for 3-stop & Radial gradients
+export interface GradientDef {
+  type?: 'linear' | 'radial'; // Defaults to 'linear' if omitted
+  from: string;
+  via?: string;               // The middle color (Optional)
+  to: string;
+  direction?: string;         // e.g., 'to right', 'to bottom right', or 'circle'/'ellipse' for radial
 }
 
 export interface TextConfig {
@@ -13,9 +25,8 @@ export interface TextConfig {
   activeTeamOverride?: TeamOverrideConfig;
   boxStyle?: {
     backgroundColor?: string; 
-    // NEW: Gradient properties explicitly for the Box/Background Shape
     isGradient?: boolean;
-    gradientColors?: { from: string; to: string; direction?: string };
+    gradientColors?: GradientDef; // Upgraded to support 3-stop/radial
     borderRadius?: string;    
     border?: string;          
     padding?: string;         
@@ -29,22 +40,22 @@ export interface TextConfig {
   strokeColor?: string; 
   strokeWidth?: string;
   isGradient?: boolean;
-  gradientColors?: { from: string; to: string; direction?: string };
+  gradientColors?: GradientDef; // Upgraded
   valueFontSize?: string;
   valueFontWeight?: string;
   valueColor?: string;
   isValueGradient?: boolean; 
-  valueGradientColors?: { from: string; to: string; direction?: string };
+  valueGradientColors?: GradientDef; // Upgraded
   prefixFontSize?: string;
   prefixFontWeight?: string;
   prefixColor?: string;
   isPrefixGradient?: boolean;
-  prefixGradientColors?: { from: string; to: string; direction?: string };
+  prefixGradientColors?: GradientDef; // Upgraded
   unitFontSize?: string;
   unitFontWeight?: string;
   unitColor?: string;
   isUnitGradient?: boolean;
-  unitGradientColors?: { from: string; to: string; direction?: string };
+  unitGradientColors?: GradientDef; // Upgraded
 }
 
 export interface ImageConfig {
@@ -112,10 +123,9 @@ export const posterTemplates: Template[] = [
       team: { 
         placeholder: 'Enter Team',
         fontSize: '80px', fontWeight: 'bold', color: '#060707',
-        // NEW: Box Gradient applied to the Team background
         boxStyle: { 
           isGradient: true, 
-          gradientColors: { from: '#edd606', to: '#eab308', direction: 'to right bottom' }, 
+          gradientColors: { type: 'linear', from: '#edd606', to: '#eab308', direction: 'to right bottom' }, 
           borderRadius: '60px' 
         } 
       }
@@ -160,13 +170,13 @@ export const posterTemplates: Template[] = [
     thumbnail: '/v2.png',
     background: '/v2.png',
     defaultTextStyles: {
-      name: { placeholder: 'Enter Name', fontSize: '120px', fontWeight: 'bold', color: '#ffffff', isGradient: true, gradientColors: { from: '#F0D28E', to: '#C8A263', direction: 'to bottom right' } },
+      name: { placeholder: 'Enter Name', fontSize: '120px', fontWeight: 'bold', color: '#ffffff', isGradient: true, gradientColors: { type: 'linear', from: '#F0D28E', to: '#C8A263', direction: 'to bottom right' } },
       detail: {
         placeholder: 'Enter Value',
         fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
-        valueFontSize: '110px', valueFontWeight: '900', valueColor: '#ffffff', isValueGradient: true, valueGradientColors: {from: '#F0D28E', to: '#C8A263 ', direction: 'to bottom'},
-        prefixFontSize: '80px', prefixFontWeight: 'bold', prefixColor: '#ffffff', isPrefixGradient: false, prefixGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
-        unitFontSize: '80px', unitFontWeight: 'bold', unitColor: '#fef08a', isUnitGradient: true, unitGradientColors: { from: '#F0D28E', to: '#C8A263', direction: 'to right' }
+        valueFontSize: '110px', valueFontWeight: '900', valueColor: '#ffffff', isValueGradient: true, valueGradientColors: { type: 'linear', from: '#F0D28E', to: '#C8A263 ', direction: 'to bottom'},
+        prefixFontSize: '80px', prefixFontWeight: 'bold', prefixColor: '#ffffff', isPrefixGradient: false, prefixGradientColors: { type: 'linear', from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
+        unitFontSize: '80px', unitFontWeight: 'bold', unitColor: '#fef08a', isUnitGradient: true, unitGradientColors: { type: 'linear', from: '#F0D28E', to: '#C8A263', direction: 'to right' }
       },
       team: { placeholder: 'Enter Team', fontSize: '70px', fontWeight: 'bold', color: '#cbd5e1' } 
     },
@@ -201,13 +211,13 @@ export const posterTemplates: Template[] = [
     background: '/v3.png',
     customFields: [], 
     defaultTextStyles: {
-      name: { placeholder: 'Enter Name', fontSize: '120px', fontWeight: 'bold', color: '#ffffff', isGradient: true, gradientColors: { from: '#F0D28E', to: '#C8A263', direction: 'to bottom right' } },
+      name: { placeholder: 'Enter Name', fontSize: '120px', fontWeight: 'bold', color: '#ffffff', isGradient: true, gradientColors: { type: 'linear', from: '#F0D28E', to: '#C8A263', direction: 'to bottom right' } },
       detail: {
         placeholder: 'Enter Value',
         fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
-        valueFontSize: '110px', valueFontWeight: '900', valueColor: '#ffffff', isValueGradient: true, valueGradientColors: {from: '#F0D28E', to: '#C8A263 ', direction: 'to bottom'},
-        prefixFontSize: '80px', prefixFontWeight: 'bold', prefixColor: '#ffffff', isPrefixGradient: false, prefixGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
-        unitFontSize: '80px', unitFontWeight: 'bold', unitColor: '#fef08a', isUnitGradient: true, unitGradientColors: { from: '#F0D28E', to: '#C8A263', direction: 'to right' }
+        valueFontSize: '110px', valueFontWeight: '900', valueColor: '#ffffff', isValueGradient: true, valueGradientColors: { type: 'linear', from: '#F0D28E', to: '#C8A263 ', direction: 'to bottom'},
+        prefixFontSize: '80px', prefixFontWeight: 'bold', prefixColor: '#ffffff', isPrefixGradient: false, prefixGradientColors: { type: 'linear', from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
+        unitFontSize: '80px', unitFontWeight: 'bold', unitColor: '#fef08a', isUnitGradient: true, unitGradientColors: { type: 'linear', from: '#F0D28E', to: '#C8A263', direction: 'to right' }
       },
       team: { placeholder: 'Enter Team', fontSize: '70px', fontWeight: 'bold', color: '#ffffff' } 
     },

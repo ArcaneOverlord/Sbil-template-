@@ -1,7 +1,6 @@
-// filepath: components/PosterCanvas.tsx
 "use client";
 import React, { forwardRef, useRef, useState, useEffect } from 'react';
-import { Template } from '@/lib/templates';
+import { Template, GradientDef } from '@/lib/templates';
 
 interface PosterProps {
   template: Template;
@@ -19,6 +18,19 @@ interface PosterProps {
 }
 
 const DEBUG_MODE = false; 
+
+// NEW HELPER: Safely constructs robust 3-stop and radial gradients
+const getGradientString = (g?: GradientDef) => {
+  if (!g || !g.from || !g.to) return undefined;
+  
+  const type = g.type || 'linear';
+  // Default to 'circle' for radial, or 'to right' for linear
+  const dir = g.direction || (type === 'radial' ? 'circle' : 'to right');
+  // Inject the middle 'via' color if it exists
+  const colorStops = g.via ? `${g.from}, ${g.via}, ${g.to}` : `${g.from}, ${g.to}`;
+  
+  return `${type}-gradient(${dir}, ${colorStops})`;
+};
 
 const FitText = ({ children, gradientStyle }: { children: React.ReactNode, gradientStyle: React.CSSProperties }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -60,13 +72,15 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
             if (field.type === 'text' && field.textConfig) {
               const tb = field.textConfig;
               const textValue = data || '';
-              const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
+              
+              const gradStr = getGradientString(tb.gradientColors);
+              const gradientStyle = tb.isGradient && gradStr ? { backgroundImage: gradStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
               
               let containerBgStyle: React.CSSProperties = {};
               if (showDebug) {
                 containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
               } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
-                containerBgStyle = { backgroundImage: `linear-gradient(${tb.boxStyle.gradientColors.direction || 'to right'}, ${tb.boxStyle.gradientColors.from}, ${tb.boxStyle.gradientColors.to})` };
+                containerBgStyle = { backgroundImage: getGradientString(tb.boxStyle.gradientColors) };
               } else if (tb.boxStyle?.backgroundColor) {
                 containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
               } else {
@@ -94,13 +108,15 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
 
           {template.globalTexts && template.globalTexts.map((tb) => {
             const textValue = tb.id === 'banner' ? globalBanner : (tb.id === 'bottomBanner' ? globalBottomBanner : tb.placeholder);
-            const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
+            
+            const gradStr = getGradientString(tb.gradientColors);
+            const gradientStyle = tb.isGradient && gradStr ? { backgroundImage: gradStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
 
             let containerBgStyle: React.CSSProperties = {};
             if (showDebug) {
               containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
             } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
-              containerBgStyle = { backgroundImage: `linear-gradient(${tb.boxStyle.gradientColors.direction || 'to right'}, ${tb.boxStyle.gradientColors.from}, ${tb.boxStyle.gradientColors.to})` };
+              containerBgStyle = { backgroundImage: getGradientString(tb.boxStyle.gradientColors) };
             } else if (tb.boxStyle?.backgroundColor) {
               containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
             } else {
@@ -141,39 +157,47 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   
                   const baseMerged = { ...(template.defaultTextStyles?.[baseTb.id] || {}), ...baseTb };
                   const hasActiveOverride = showTeamInput && baseMerged.activeTeamOverride && baseMerged.activeTeamOverride.active !== false;
-                  
-                  // Safely merge objects to prevent TS errors on Vercel
                   const overrideParams = hasActiveOverride ? baseMerged.activeTeamOverride : {};
                   
-                  // Deep Merge BoxStyle Object
-                  const mergedBoxStyle = { ...(baseMerged.boxStyle || {}), ...(overrideParams?.boxStyle || {}) };
+                  // Clean Merge of Gradient Definitions (Strictly Typed)
+                  const mergedBoxStyle: any = { ...(baseMerged.boxStyle || {}), ...(overrideParams?.boxStyle || {}) };
                   if (baseMerged.boxStyle?.gradientColors || overrideParams?.boxStyle?.gradientColors) {
-                      mergedBoxStyle.gradientColors = {
-                          ...(baseMerged.boxStyle?.gradientColors || {}),
-                          ...(overrideParams?.boxStyle?.gradientColors || {})
-                      };
+                      mergedBoxStyle.gradientColors = { ...(baseMerged.boxStyle?.gradientColors || {}), ...(overrideParams?.boxStyle?.gradientColors || {}) } as GradientDef;
                   }
                   
-                  // Deep Merge Main Text Gradient Object
-                  const mergedGradientColors = { ...(baseMerged.gradientColors || {}), ...(overrideParams?.gradientColors || {}) };
+                  const mergedGradientColors = { ...(baseMerged.gradientColors || {}), ...(overrideParams?.gradientColors || {}) } as GradientDef;
+                  const mergedPrefixGradient = { ...(baseMerged.prefixGradientColors || {}), ...(overrideParams?.prefixGradientColors || {}) } as GradientDef;
+                  const mergedValueGradient = { ...(baseMerged.valueGradientColors || {}), ...(overrideParams?.valueGradientColors || {}) } as GradientDef;
+                  const mergedUnitGradient = { ...(baseMerged.unitGradientColors || {}), ...(overrideParams?.unitGradientColors || {}) } as GradientDef;
                   
                   const tb = { 
                     ...baseMerged, 
                     ...overrideParams,
                     boxStyle: Object.keys(mergedBoxStyle).length > 0 ? mergedBoxStyle : undefined,
-                    gradientColors: Object.keys(mergedGradientColors).length > 0 ? mergedGradientColors : undefined
+                    gradientColors: Object.keys(mergedGradientColors).length > 0 ? mergedGradientColors : undefined,
+                    prefixGradientColors: Object.keys(mergedPrefixGradient).length > 0 ? mergedPrefixGradient : undefined,
+                    valueGradientColors: Object.keys(mergedValueGradient).length > 0 ? mergedValueGradient : undefined,
+                    unitGradientColors: Object.keys(mergedUnitGradient).length > 0 ? mergedUnitGradient : undefined
                   };
                   
-                  const gradientStyle = tb.isGradient && tb.gradientColors ? { backgroundImage: `linear-gradient(${tb.gradientColors.direction || 'to right'}, ${tb.gradientColors.from}, ${tb.gradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
-                  const prefixGradientStyle = tb.isPrefixGradient && tb.prefixGradientColors ? { backgroundImage: `linear-gradient(${tb.prefixGradientColors.direction || 'to right'}, ${tb.prefixGradientColors.from}, ${tb.prefixGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
-                  const valueGradientStyle = tb.isValueGradient && tb.valueGradientColors ? { backgroundImage: `linear-gradient(${tb.valueGradientColors.direction || 'to right'}, ${tb.valueGradientColors.from}, ${tb.valueGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
-                  const unitGradientStyle = tb.isUnitGradient && tb.unitGradientColors ? { backgroundImage: `linear-gradient(${tb.unitGradientColors.direction || 'to right'}, ${tb.unitGradientColors.from}, ${tb.unitGradientColors.to})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
+                  // Generate cleanly utilizing our new helper
+                  const gStyleStr = getGradientString(tb.gradientColors);
+                  const gradientStyle = tb.isGradient && gStyleStr ? { backgroundImage: gStyleStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
+                  
+                  const preStr = getGradientString(tb.prefixGradientColors);
+                  const prefixGradientStyle = tb.isPrefixGradient && preStr ? { backgroundImage: preStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
+                  
+                  const valStr = getGradientString(tb.valueGradientColors);
+                  const valueGradientStyle = tb.isValueGradient && valStr ? { backgroundImage: valStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
+                  
+                  const unitStr = getGradientString(tb.unitGradientColors);
+                  const unitGradientStyle = tb.isUnitGradient && unitStr ? { backgroundImage: unitStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
 
                   let containerBgStyle: React.CSSProperties = {};
                   if (showDebug) {
                     containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
                   } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
-                    containerBgStyle = { backgroundImage: `linear-gradient(${tb.boxStyle.gradientColors.direction || 'to right'}, ${tb.boxStyle.gradientColors.from}, ${tb.boxStyle.gradientColors.to})` };
+                    containerBgStyle = { backgroundImage: getGradientString(tb.boxStyle.gradientColors) };
                   } else if (tb.boxStyle?.backgroundColor) {
                     containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
                   } else {
