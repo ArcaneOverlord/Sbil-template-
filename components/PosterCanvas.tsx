@@ -17,16 +17,13 @@ interface PosterProps {
   customData: Record<string, any>; 
 }
 
-const DEBUG_MODE = true; 
+const DEBUG_MODE = false; 
 
-// NEW HELPER: Safely constructs robust 3-stop and radial gradients
 const getGradientString = (g?: GradientDef) => {
   if (!g || !g.from || !g.to) return undefined;
   
   const type = g.type || 'linear';
-  // Default to 'circle' for radial, or 'to right' for linear
   const dir = g.direction || (type === 'radial' ? 'circle' : 'to right');
-  // Inject the middle 'via' color if it exists
   const colorStops = g.via ? `${g.from}, ${g.via}, ${g.to}` : `${g.from}, ${g.to}`;
   
   return `${type}-gradient(${dir}, ${colorStops})`;
@@ -77,12 +74,12 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
               const gradientStyle = tb.isGradient && gradStr ? { backgroundImage: gradStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
               
               let containerBgStyle: React.CSSProperties = {};
-              if (showDebug) {
-                containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
-              } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
+              if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
                 containerBgStyle = { backgroundImage: getGradientString(tb.boxStyle.gradientColors) };
               } else if (tb.boxStyle?.backgroundColor) {
                 containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
+              } else if (showDebug) {
+                containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' }; // Only tints if transparent
               } else {
                 containerBgStyle = { backgroundColor: 'transparent' };
               }
@@ -113,12 +110,12 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
             const gradientStyle = tb.isGradient && gradStr ? { backgroundImage: gradStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
 
             let containerBgStyle: React.CSSProperties = {};
-            if (showDebug) {
-              containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
-            } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
+            if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
               containerBgStyle = { backgroundImage: getGradientString(tb.boxStyle.gradientColors) };
             } else if (tb.boxStyle?.backgroundColor) {
               containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
+            } else if (showDebug) {
+              containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
             } else {
               containerBgStyle = { backgroundColor: 'transparent' };
             }
@@ -159,7 +156,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   const hasActiveOverride = showTeamInput && baseMerged.activeTeamOverride && baseMerged.activeTeamOverride.active !== false;
                   const overrideParams = hasActiveOverride ? baseMerged.activeTeamOverride : {};
                   
-                  // Clean Merge of Gradient Definitions (Strictly Typed)
                   const mergedBoxStyle: any = { ...(baseMerged.boxStyle || {}), ...(overrideParams?.boxStyle || {}) };
                   if (baseMerged.boxStyle?.gradientColors || overrideParams?.boxStyle?.gradientColors) {
                       mergedBoxStyle.gradientColors = { ...(baseMerged.boxStyle?.gradientColors || {}), ...(overrideParams?.boxStyle?.gradientColors || {}) } as GradientDef;
@@ -180,7 +176,6 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                     unitGradientColors: Object.keys(mergedUnitGradient).length > 0 ? mergedUnitGradient : undefined
                   };
                   
-                  // Generate cleanly utilizing our new helper
                   const gStyleStr = getGradientString(tb.gradientColors);
                   const gradientStyle = tb.isGradient && gStyleStr ? { backgroundImage: gStyleStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
                   
@@ -194,12 +189,12 @@ const PosterCanvas = forwardRef<HTMLDivElement, PosterProps>(({ template, global
                   const unitGradientStyle = tb.isUnitGradient && unitStr ? { backgroundImage: unitStr, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' } : {};
 
                   let containerBgStyle: React.CSSProperties = {};
-                  if (showDebug) {
-                    containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' };
-                  } else if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
+                  if (tb.boxStyle?.isGradient && tb.boxStyle?.gradientColors) {
                     containerBgStyle = { backgroundImage: getGradientString(tb.boxStyle.gradientColors) };
                   } else if (tb.boxStyle?.backgroundColor) {
                     containerBgStyle = { backgroundColor: tb.boxStyle.backgroundColor };
+                  } else if (showDebug) {
+                    containerBgStyle = { backgroundColor: 'rgba(239, 68, 68, 0.2)' }; // Only tints if transparent
                   } else {
                     containerBgStyle = { backgroundColor: 'transparent' };
                   }
