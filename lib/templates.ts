@@ -249,7 +249,135 @@ export const posterTemplates: Template[] = [
           { id: 'detail', top: '77.4%', left: '61%', width: '900px', height: '150px', activeTeamOverride: { active: true, top: '75%' } }, 
           { id: 'team', top: '81%', left: '61%', width: '900px', height: '120px', boxStyle: { backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: '60px' } } 
         ]
+      },
+      
+        // ----------------------------------------------------
+  // TEMPLATE 4:V4
+  // ----------------------------------------------------
+  {
+    id: 'sbi-life-top-3',
+    name: 'Top 3 Achievers (Gold)',
+    description: 'Standard MTD/YTD recognition poster for top 3 sales performers.',
+    thumbnail: '/v4.png',
+    background: '/v4.png',
+    defaultTextStyles: {
+      name: { 
+        placeholder: 'Enter Name', 
+        fontSize: '160px', fontWeight: 'bold', color: '#ffffff', isGradient: false, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } 
+      },
+      detail: {
+        placeholder: 'Enter Value',
+        fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
+        valueFontSize: '180px', valueFontWeight: '900', valueColor: '#ffffff', isValueGradient: true, valueGradientColors: {from: '#fef08a', to: '#eab308', direction: 'to bottom'},
+        prefixFontSize: '110px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1', isPrefixGradient: false, prefixGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
+        unitFontSize: '120px', unitFontWeight: 'bold', unitColor: '#eab308', isUnitGradient: true, unitGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to right' }
+      },
+      team: { 
+        placeholder: 'Enter Team',
+        fontSize: '80px', fontWeight: 'bold', color: '#060707',
+        boxStyle: { 
+          isGradient: true, 
+          gradientColors: { type: 'linear', from: '#edd606', to: '#eab308', direction: 'to right bottom' }, 
+          borderRadius: '60px' 
+        } 
       }
+    },
+    globalTexts: [
+      { id: 'banner', placeholder: 'MTD TOPPERS', top: '16%', left: '20%', width: '60%', height: '300px', fontSize: '155px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px', isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } },
+      { id: 'bottomBanner', placeholder: 'TEAM KATTAKADA', top: '90%', left: '20%', width: '60%', height: '250px', fontSize: '140px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '4px' }
+    ],
+    slots: [
+      {
+        id: 0, imageBox: { top: '27.5%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        textBoxes: [ 
+          { id: 'name', top: '34.5%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '31%', fontSize: '140px' } }, 
+          { id: 'detail', top: '41.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '40%' } }, 
+          { id: 'team', top: '43.5%', left: '51%', width: '1400px', height: '90px' } 
+        ]
+      },
+      {
+        id: 1, imageBox: { top: '49%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        textBoxes: [ 
+          { id: 'name', top: '56%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '52.5%', fontSize: '140px' } }, 
+          { id: 'detail', top: '62.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '61.3%' } }, 
+          { id: 'team', top: '64.8%', left: '51%', width: '1400px', height: '90px' } ]
+      },
+      {
+        id: 2, imageBox: { top: '70%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        textBoxes: [ 
+          { id: 'name', top: '76.3%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '73%', fontSize: '140px' } }, 
+          { id: 'detail', top: '82.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '81.7%' } }, 
+          { id: 'team', top: '85%', left: '51%', width: '1400px', height: '90px' } ]
+      }
+    ]
+  },
+  
+    // ----------------------------------------------------
+  // TEMPLATE v5: Original v5
+  // ----------------------------------------------------
+  {
+    id: 'sbi-life-top-3',
+    name: 'Top 3 Achievers (Gold)',
+    description: 'Standard MTD/YTD recognition poster for top 3 sales performers.',
+    thumbnail: '/v5.png',
+    background: '/v5.png',
+    defaultTextStyles: {
+      name: { 
+        placeholder: 'Enter Name', 
+        fontSize: '160px', fontWeight: 'bold', color: '#ffffff', isGradient: false, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } 
+      },
+      detail: {
+        placeholder: 'Enter Value',
+        fontSize: '100px', fontWeight: 'bold', color: '#94a3b8',
+        valueFontSize: '180px', valueFontWeight: '900', valueColor: '#ffffff', isValueGradient: true, valueGradientColors: {from: '#fef08a', to: '#eab308', direction: 'to bottom'},
+        prefixFontSize: '110px', prefixFontWeight: 'bold', prefixColor: '#cbd5e1', isPrefixGradient: false, prefixGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' },
+        unitFontSize: '120px', unitFontWeight: 'bold', unitColor: '#eab308', isUnitGradient: true, unitGradientColors: { from: '#fef08a', to: '#eab308', direction: 'to right' }
+      },
+      team: { 
+        placeholder: 'Enter Team',
+        fontSize: '80px', fontWeight: 'bold', color: '#060707',
+        boxStyle: { 
+          isGradient: true, 
+          gradientColors: { type: 'linear', from: '#edd606', to: '#eab308', direction: 'to right bottom' }, 
+          borderRadius: '60px' 
+        } 
+      }
+    },
+    globalTexts: [
+      { id: 'banner', placeholder: 'MTD TOPPERS', top: '16%', left: '20%', width: '60%', height: '300px', fontSize: '155px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '6px', isGradient: true, gradientColors: { from: '#fef08a', to: '#eab308', direction: 'to bottom right' } },
+      { id: 'bottomBanner', placeholder: 'TEAM KATTAKADA', top: '90%', left: '20%', width: '60%', height: '250px', fontSize: '140px', fontWeight: '900', color: '#000000', isCurved: true, curvePath: 'M 100,250 Q 1050,80 2000,250', strokeColor: '#000000', strokeWidth: '4px' }
+    ],
+    slots: [
+      {
+        id: 0, imageBox: { top: '27.5%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        textBoxes: [ 
+          { id: 'name', top: '34.5%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '31%', fontSize: '140px' } }, 
+          { id: 'detail', top: '41.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '40%' } }, 
+          { id: 'team', top: '43.5%', left: '51%', width: '1400px', height: '90px' } 
+        ]
+      },
+      {
+        id: 1, imageBox: { top: '49%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        textBoxes: [ 
+          { id: 'name', top: '56%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '52.5%', fontSize: '140px' } }, 
+          { id: 'detail', top: '62.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '61.3%' } }, 
+          { id: 'team', top: '64.8%', left: '51%', width: '1400px', height: '90px' } ]
+      },
+      {
+        id: 2, imageBox: { top: '70%', left: '20.5%', width: '900px', height: '950px', borderRadius: '40px', backgroundColor: '#e5e7eb', borderColor: 'transparent', borderWidth: '0px', zIndex: 0, opacity: 1 },
+        textBoxes: [ 
+          { id: 'name', top: '76.3%', left: '48%', width: '1600px', height: '250px', activeTeamOverride: { active: false, top: '73%', fontSize: '140px' } }, 
+          { id: 'detail', top: '82.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '81.7%' } }, 
+          { id: 'team', top: '85%', left: '51%', width: '1400px', height: '90px' } ]
+      }
+    ]
+  }
+
+  
+  
+  
+  
+  
     ]
   }
 ];
