@@ -17,7 +17,7 @@ interface PosterProps {
   customData: Record<string, any>; 
 }
 
-const DEBUG_MODE = false; 
+const DEBUG_MODE = true; 
 
 // NEW HELPER: Safely constructs robust 3-stop and radial gradients
 const getGradientString = (g?: GradientDef) => {
