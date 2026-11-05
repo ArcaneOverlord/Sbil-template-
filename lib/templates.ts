@@ -6,13 +6,12 @@ export interface TeamOverrideConfig extends Partial<Omit<TextConfig, 'id' | 'act
   active?: boolean; 
 }
 
-// NEW: Universal Gradient Definition for 3-stop & Radial gradients
 export interface GradientDef {
-  type?: 'linear' | 'radial'; // Defaults to 'linear' if omitted
+  type?: 'linear' | 'radial'; 
   from: string;
-  via?: string;               // The middle color (Optional)
+  via?: string;               
   to: string;
-  direction?: string;         // e.g., 'to right', 'to bottom right', or 'circle'/'ellipse' for radial
+  direction?: string;         
 }
 
 export interface TextConfig {
@@ -26,7 +25,7 @@ export interface TextConfig {
   boxStyle?: {
     backgroundColor?: string; 
     isGradient?: boolean;
-    gradientColors?: GradientDef; // Upgraded to support 3-stop/radial
+    gradientColors?: GradientDef; 
     borderRadius?: string;    
     border?: string;          
     padding?: string;         
@@ -40,22 +39,22 @@ export interface TextConfig {
   strokeColor?: string; 
   strokeWidth?: string;
   isGradient?: boolean;
-  gradientColors?: GradientDef; // Upgraded
+  gradientColors?: GradientDef; 
   valueFontSize?: string;
   valueFontWeight?: string;
   valueColor?: string;
   isValueGradient?: boolean; 
-  valueGradientColors?: GradientDef; // Upgraded
+  valueGradientColors?: GradientDef; 
   prefixFontSize?: string;
   prefixFontWeight?: string;
   prefixColor?: string;
   isPrefixGradient?: boolean;
-  prefixGradientColors?: GradientDef; // Upgraded
+  prefixGradientColors?: GradientDef; 
   unitFontSize?: string;
   unitFontWeight?: string;
   unitColor?: string;
   isUnitGradient?: boolean;
-  unitGradientColors?: GradientDef; // Upgraded
+  unitGradientColors?: GradientDef; 
 }
 
 export interface ImageConfig {
@@ -67,8 +66,10 @@ export interface ImageConfig {
   backgroundColor: string;
   borderColor: string;
   borderWidth: string;
-  zIndex: number;
-  opacity: number; 
+  // FIX: Accepting both number and string prevents Vercel build crashes 
+  // if you accidentally wrap a value in quotes.
+  zIndex: number | string; 
+  opacity: number | string; 
 }
 
 export interface CustomField {
@@ -81,7 +82,8 @@ export interface CustomField {
 }
 
 export interface SlotConfig {
-  id: number;
+  // FIX: Allowing string IDs prevents build errors if '0' is used instead of 0.
+  id: number | string;
   imageBox: ImageConfig;
   textBoxes: TextConfig[];
 }
@@ -249,13 +251,15 @@ export const posterTemplates: Template[] = [
           { id: 'detail', top: '77.4%', left: '61%', width: '900px', height: '150px', activeTeamOverride: { active: true, top: '75%' } }, 
           { id: 'team', top: '81%', left: '61%', width: '900px', height: '120px', boxStyle: { backgroundColor: 'rgba(0, 0, 0, 0.4)', borderRadius: '60px' } } 
         ]
-      },
-      
-        // ----------------------------------------------------
+      }
+    ]
+  },
+
+  // ----------------------------------------------------
   // TEMPLATE 4:V4
   // ----------------------------------------------------
   {
-    id: 'sbi-life-top-3',
+    id: 'sbi-life-top-3-v4', // Ensure unique ID
     name: 'Top 3 Achievers (Gold)',
     description: 'Standard MTD/YTD recognition poster for top 3 sales performers.',
     thumbnail: '/v4.png',
@@ -312,11 +316,11 @@ export const posterTemplates: Template[] = [
     ]
   },
   
-    // ----------------------------------------------------
+  // ----------------------------------------------------
   // TEMPLATE v5: Original v5
   // ----------------------------------------------------
   {
-    id: 'sbi-life-top-3',
+    id: 'sbi-life-top-3-v5', // Ensure unique ID
     name: 'Top 3 Achievers (Gold)',
     description: 'Standard MTD/YTD recognition poster for top 3 sales performers.',
     thumbnail: '/v5.png',
@@ -370,14 +374,6 @@ export const posterTemplates: Template[] = [
           { id: 'detail', top: '82.5%', left: '48%', width: '1600px', height: '150px', activeTeamOverride: { active: true, top: '81.7%' } }, 
           { id: 'team', top: '85%', left: '51%', width: '1400px', height: '90px' } ]
       }
-    ]
-  }
-
-  
-  
-  
-  
-  
     ]
   }
 ];
